@@ -1,0 +1,28 @@
+{
+  "name": "setup-project",
+  "version": "1.0.0",
+  "description": "\"\"",
+  "main": "index.js",
+  "scripts": {
+    "tsc:watch": "tsc --watch",
+    "start": "node --watch dist/main.js"
+  },
+  "repository": "\"\"",
+  "author": "Rodrigo Costa Silva",
+  "license": "\"\"",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^22.15.14",
+    "@typescript-eslint/eslint-plugin": "^8.32.0",
+    "@typescript-eslint/parser": "^8.32.0",
+    "eslint": "8",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.804.0",
+    "@aws-sdk/client-ses": "^3.804.0",
+    "@aws-sdk/client-sqs": "^3.804.0",
+    "@aws-sdk/lib-dynamodb": "^3.804.0",
+    "fastify": "^5.3.2"
+  }
+}
