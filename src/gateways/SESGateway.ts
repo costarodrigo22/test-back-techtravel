@@ -1,13 +1,10 @@
 import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
+import {
+  IEmailGateway,
+  ISendEmailParams,
+} from '../interfaces/gateways/IEmailGateway';
 
-interface ISendEmailParams {
-  from: string;
-  to: string[];
-  subject: string;
-  html: string;
-}
-
-export class SESGateway {
+export class SESGateway implements IEmailGateway {
   private client = new SESClient();
 
   async sendEmail({
