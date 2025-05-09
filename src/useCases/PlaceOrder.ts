@@ -1,24 +1,25 @@
 import { Order } from '../entities/Order';
-import { DynamoOrdersRepository } from '../repository/DynamoOrdersRepository';
-import { SQSGateway } from '../gateways/SQSGateway';
-import { SESGateway } from '../gateways/SESGateway';
+import { IOrdersRepository } from '../interfaces/repositories/IOrdersRepository';
+import { IQueueGateway } from '../interfaces/gateways/IQueueGateway';
+import { IEmailGateway } from '../interfaces/gateways/IEmailGateway';
 
 export class PlaceOrder {
-  async execute(
-    dynamoOrderRepository: DynamoOrdersRepository,
-    sqsGateway: SQSGateway,
-    sesGateway: SESGateway
-  ) {
+  constructor(
+    private readonly ordersRepository: IOrdersRepository,
+    private readonly queueGateway: IQueueGateway,
+    private readonly emailGateway: IEmailGateway
+  ) {}
+  async execute() {
     const customerEmail = 'drigo_123_123@hotmail.com';
     const amount = Math.ceil(Math.random() * 1000);
 
     const order = new Order(customerEmail, amount);
 
-    dynamoOrderRepository.create(order);
+    this.ordersRepository.create(order);
 
-    sqsGateway.publishMessage({ orderId: order.id });
+    this.queueGateway.publishMessage({ orderId: order.id });
 
-    sesGateway.sendEmail({
+    this.emailGateway.sendEmail({
       from: 'costarodrigosilva247@gmail.com',
       to: [customerEmail],
       subject: `O pedido #${order.id} foi confirmado`,
