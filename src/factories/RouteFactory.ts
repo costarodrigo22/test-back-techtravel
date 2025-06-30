@@ -6,8 +6,17 @@ import { FlightController } from '../controllers/FlightController';
 import { AirlineController } from '../controllers/AirlineController';
 import { AirportController } from '../controllers/AirportController';
 import { ItineraryController } from '../controllers/ItineraryController';
+import { AvailabilityController } from '../controllers/AvailabilityController';
+import { BookingController } from '../controllers/BookingController';
+import { Container } from '../di/Container';
 
 export class RouteFactory implements IRouteFactory {
+  private container: Container;
+
+  constructor() {
+    this.container = new Container();
+  }
+
   createAuthRoutes(authController: IAuthController): Router {
     const router = Router();
 
@@ -22,6 +31,10 @@ export class RouteFactory implements IRouteFactory {
     const router = Router();
 
     router.get('/profile', (req, res) => userController.getProfile(req, res));
+    router.get('/:userId/bookings', (req, res) => {
+      const bookingController = this.container.resolve('BookingController') as BookingController;
+      return bookingController.listUserBookings(req, res);
+    });
 
     return router;
   }
@@ -64,6 +77,19 @@ export class RouteFactory implements IRouteFactory {
     router.post('/', (req, res) => itineraryController.create(req, res));
     router.get('/:id', (req, res) => itineraryController.get(req, res));
     router.delete('/:id', (req, res) => itineraryController.delete(req, res));
+    return router;
+  }
+
+  createAvailabilityRoutes(availabilityController: AvailabilityController): Router {
+    const router = Router();
+    router.post('/search', (req, res) => availabilityController.search(req, res));
+    return router;
+  }
+
+  createBookingRoutes(bookingController: BookingController): Router {
+    const router = Router();
+    router.post('/', (req, res) => bookingController.create(req, res));
+    router.delete('/:id', (req, res) => bookingController.cancel(req, res));
     return router;
   }
 } 

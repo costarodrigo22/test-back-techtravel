@@ -1,17 +1,6 @@
 import { IContainer } from '../interfaces/container/IContainer';
 import { IUsersRepository } from '../interfaces/repositories/IUsersRepository';
 import { IAuthService } from '../interfaces/services/IAuthService';
-import { IRegisterUserUseCase } from '../interfaces/useCases/auth/IRegisterUserUseCase';
-import { ILoginUserUseCase } from '../interfaces/useCases/auth/ILoginUserUseCase';
-import { IRefreshTokenUseCase } from '../interfaces/useCases/auth/IRefreshTokenUseCase';
-import { IGetUserProfileUseCase } from '../interfaces/useCases/user/IGetUserProfileUseCase';
-import { IAuthController } from '../interfaces/controllers/IAuthController';
-import { IUserController } from '../interfaces/controllers/IUserController';
-import { IRouteFactory } from '../interfaces/routes/IRouteFactory';
-import { IFlightsRepository } from '../interfaces/repositories/IFlightsRepository';
-import { IAirlinesRepository } from '../interfaces/repositories/IAirlinesRepository';
-import { IAirportsRepository } from '../interfaces/repositories/IAirportsRepository';
-import { IItinerariesRepository } from '../interfaces/repositories/IItinerariesRepository';
 
 import { PrismaUsersRepository } from '../repository/PrismaUsersRepository';
 import { AuthService } from '../services/AuthService';
@@ -26,6 +15,7 @@ import { PrismaFlightsRepository } from '../repository/PrismaFlightsRepository';
 import { PrismaAirlinesRepository } from '../repository/PrismaAirlinesRepository';
 import { PrismaAirportsRepository } from '../repository/PrismaAirportsRepository';
 import { PrismaItinerariesRepository } from '../repository/PrismaItinerariesRepository';
+import { PrismaBookingsRepository } from '../repository/PrismaBookingsRepository';
 import { CreateFlight } from '../useCases/flight/CreateFlight';
 import { GetFlightById } from '../useCases/flight/GetFlightById';
 import { UpdateFlight } from '../useCases/flight/UpdateFlight';
@@ -49,6 +39,12 @@ import { CreateItinerary } from '../useCases/itinerary/CreateItinerary';
 import { GetItineraryById } from '../useCases/itinerary/GetItineraryById';
 import { DeleteItinerary } from '../useCases/itinerary/DeleteItinerary';
 import { ItineraryController } from '../controllers/ItineraryController';
+import { SearchAvailability } from '../useCases/availability/SearchAvailability';
+import { AvailabilityController } from '../controllers/AvailabilityController';
+import { CreateBooking } from '../useCases/booking/CreateBooking';
+import { GetUserBookings } from '../useCases/booking/GetUserBookings';
+import { CancelBooking } from '../useCases/booking/CancelBooking';
+import { BookingController } from '../controllers/BookingController';
 
 type Constructor<T> = new (...args: any[]) => T;
 type DependencyResolver<T> = () => T;
@@ -114,6 +110,7 @@ export class Container implements IContainer {
     this.register('IAirlinesRepository', PrismaAirlinesRepository);
     this.register('IAirportsRepository', PrismaAirportsRepository);
     this.register('IItinerariesRepository', PrismaItinerariesRepository);
+    this.register('IBookingsRepository', PrismaBookingsRepository);
 
     // Register services
     this.registerFactory('IAuthService', () => {
@@ -172,6 +169,14 @@ export class Container implements IContainer {
     this.registerFactory('GetItineraryById', () => new GetItineraryById(this.resolve('IItinerariesRepository')));
     this.registerFactory('DeleteItinerary', () => new DeleteItinerary(this.resolve('IItinerariesRepository')));
 
+    // Register use cases - Availability
+    this.registerFactory('SearchAvailability', () => new SearchAvailability(this.resolve('IFlightsRepository'), this.resolve('IItinerariesRepository')));
+
+    // Register use cases - Booking
+    this.registerFactory('CreateBooking', () => new CreateBooking(this.resolve('IBookingsRepository'), this.resolve('IUsersRepository'), this.resolve('IItinerariesRepository')));
+    this.registerFactory('GetUserBookings', () => new GetUserBookings(this.resolve('IBookingsRepository'), this.resolve('IUsersRepository')));
+    this.registerFactory('CancelBooking', () => new CancelBooking(this.resolve('IBookingsRepository')));
+
     // Register controllers
     this.registerFactory('IAuthController', () => {
       const registerUser = this.resolve<RegisterUser>('IRegisterUserUseCase');
@@ -215,6 +220,12 @@ export class Container implements IContainer {
       this.resolve('GetItineraryById'),
       this.resolve('DeleteItinerary')
     ));
+
+    // Register controller - Availability
+    this.registerFactory('AvailabilityController', () => new AvailabilityController(this.resolve('SearchAvailability')));
+
+    // Register controller - Booking
+    this.registerFactory('BookingController', () => new BookingController(this.resolve('CreateBooking'), this.resolve('GetUserBookings'), this.resolve('CancelBooking')));
 
     // Register factories
     this.register('IRouteFactory', RouteFactory);

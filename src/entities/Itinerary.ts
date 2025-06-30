@@ -5,6 +5,7 @@ export interface ItineraryFlight {
   destination_iata: string;
   departure_datetime: Date;
   arrival_datetime: Date;
+  airline_iata_code?: string;
 }
 
 export class Itinerary {

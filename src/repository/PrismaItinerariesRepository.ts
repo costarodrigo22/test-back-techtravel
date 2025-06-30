@@ -10,7 +10,11 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
       include: {
         flights: {
           include: {
-            flight: true
+            flight: {
+              include: {
+                airline: true
+              }
+            }
           },
           orderBy: { order: 'asc' }
         }
@@ -24,6 +28,7 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
         destination_iata: f.flight.destination_iata,
         departure_datetime: f.flight.departure_datetime,
         arrival_datetime: f.flight.arrival_datetime,
+        airline_iata_code: f.flight.airline?.iata_code
       }));
       if (flightsData.length === 0) {
         return new Itinerary(it.id, '', '', new Date(), new Date(), 0, 0, []);
@@ -103,7 +108,13 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
       where: { id },
       include: {
         flights: {
-          include: { flight: true },
+          include: { 
+            flight: {
+              include: {
+                airline: true
+              }
+            }
+          },
           orderBy: { order: 'asc' }
         }
       }
@@ -116,6 +127,7 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
       destination_iata: f.flight.destination_iata,
       departure_datetime: f.flight.departure_datetime,
       arrival_datetime: f.flight.arrival_datetime,
+      airline_iata_code: f.flight.airline?.iata_code
     }));
     if (flightsData.length === 0) {
       return new Itinerary(it.id, '', '', new Date(), new Date(), 0, 0, []);

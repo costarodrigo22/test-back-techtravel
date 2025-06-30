@@ -11,6 +11,8 @@ import { FlightController } from './controllers/FlightController';
 import { AirlineController } from './controllers/AirlineController';
 import { AirportController } from './controllers/AirportController';
 import { ItineraryController } from './controllers/ItineraryController';
+import { AvailabilityController } from './controllers/AvailabilityController';
+import { BookingController } from './controllers/BookingController';
 
 dotenv.config();
 
@@ -33,14 +35,18 @@ const flightController = container.resolve('FlightController') as FlightControll
 const airlineController = container.resolve('AirlineController') as AirlineController;
 const airportController = container.resolve('AirportController') as AirportController;
 const itineraryController = container.resolve('ItineraryController') as ItineraryController;
+const availabilityController = container.resolve('AvailabilityController') as AvailabilityController;
+const bookingController = container.resolve('BookingController') as BookingController;
 
 // Routes
 app.use('/auth', routeFactory.createAuthRoutes(authController));
-app.use('/users', authMiddleware(authService), routeFactory.createUserRoutes(userController));
 app.use('/flights', authMiddleware(authService), routeFactory.createFlightRoutes(flightController));
 app.use('/airlines', authMiddleware(authService), routeFactory.createAirlineRoutes(airlineController));
 app.use('/airports', authMiddleware(authService), routeFactory.createAirportRoutes(airportController));
 app.use('/itineraries', authMiddleware(authService), routeFactory.createItineraryRoutes(itineraryController));
+app.use('/availability', authMiddleware(authService), routeFactory.createAvailabilityRoutes(availabilityController));
+app.use('/bookings', authMiddleware(authService), routeFactory.createBookingRoutes(bookingController));
+app.use('/users', authMiddleware(authService), routeFactory.createUserRoutes(userController));
 
 // Health check
 app.get('/health', (req, res) => {

@@ -86,6 +86,8 @@ model Booking {
   user_id      String
   itinerary_id String
   status       BookingStatus
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   user         User      @relation(fields: [user_id], references: [id])
   itinerary    Itinerary @relation(fields: [itinerary_id], references: [id])

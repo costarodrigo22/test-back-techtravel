@@ -7,6 +7,7 @@ export class Flight {
   public departure_datetime: Date;
   public arrival_datetime: Date;
   public frequency: number[];
+  public airline_iata_code?: string;
 
   constructor(
     id: string,
@@ -16,7 +17,8 @@ export class Flight {
     destination_iata: string,
     departure_datetime: Date,
     arrival_datetime: Date,
-    frequency: number[]
+    frequency: number[],
+    airline_iata_code?: string
   ) {
     this.id = id;
     this.flight_number = flight_number;
@@ -26,5 +28,6 @@ export class Flight {
     this.departure_datetime = departure_datetime;
     this.arrival_datetime = arrival_datetime;
     this.frequency = frequency;
+    this.airline_iata_code = airline_iata_code;
   }
 } 

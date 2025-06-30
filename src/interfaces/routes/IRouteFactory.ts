@@ -5,6 +5,8 @@ import { FlightController } from '../../controllers/FlightController';
 import { AirlineController } from '../../controllers/AirlineController';
 import { AirportController } from '../../controllers/AirportController';
 import { ItineraryController } from '../../controllers/ItineraryController';
+import { AvailabilityController } from '../../controllers/AvailabilityController';
+import { BookingController } from '../../controllers/BookingController';
 
 export interface IRouteFactory {
   createAuthRoutes(authController: IAuthController): Router;
@@ -13,4 +15,6 @@ export interface IRouteFactory {
   createAirlineRoutes(airlineController: AirlineController): Router;
   createAirportRoutes(airportController: AirportController): Router;
   createItineraryRoutes(itineraryController: ItineraryController): Router;
+  createAvailabilityRoutes(availabilityController: AvailabilityController): Router;
+  createBookingRoutes(bookingController: BookingController): Router;
 } 

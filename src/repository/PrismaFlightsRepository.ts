@@ -39,8 +39,11 @@ export class PrismaFlightsRepository implements IFlightsRepository {
     }
     const flights = await this.prisma.flight.findMany({
       where,
+      include: {
+        airline: true
+      }
     });
-    return flights.map(this.mapPrismaToFlight);
+    return flights.map(this.mapPrismaToFlightWithAirline);
   }
 
   async update(id: string, flight: Partial<Flight>): Promise<Flight | null> {
@@ -65,6 +68,20 @@ export class PrismaFlightsRepository implements IFlightsRepository {
       prismaFlight.departure_datetime,
       prismaFlight.arrival_datetime,
       prismaFlight.frequency
+    );
+  }
+
+  private mapPrismaToFlightWithAirline(prismaFlight: any): Flight {
+    return new Flight(
+      prismaFlight.id,
+      prismaFlight.flight_number,
+      prismaFlight.airline_id,
+      prismaFlight.origin_iata,
+      prismaFlight.destination_iata,
+      prismaFlight.departure_datetime,
+      prismaFlight.arrival_datetime,
+      prismaFlight.frequency,
+      prismaFlight.airline?.iata_code
     );
   }
 } 
