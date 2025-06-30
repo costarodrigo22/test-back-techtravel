@@ -8,6 +8,10 @@ import { IGetUserProfileUseCase } from '../interfaces/useCases/user/IGetUserProf
 import { IAuthController } from '../interfaces/controllers/IAuthController';
 import { IUserController } from '../interfaces/controllers/IUserController';
 import { IRouteFactory } from '../interfaces/routes/IRouteFactory';
+import { IFlightsRepository } from '../interfaces/repositories/IFlightsRepository';
+import { IAirlinesRepository } from '../interfaces/repositories/IAirlinesRepository';
+import { IAirportsRepository } from '../interfaces/repositories/IAirportsRepository';
+import { IItinerariesRepository } from '../interfaces/repositories/IItinerariesRepository';
 
 import { PrismaUsersRepository } from '../repository/PrismaUsersRepository';
 import { AuthService } from '../services/AuthService';
@@ -18,6 +22,33 @@ import { GetUserProfile } from '../useCases/user/GetUserProfile';
 import { AuthController } from '../controllers/AuthController';
 import { UserController } from '../controllers/UserController';
 import { RouteFactory } from '../factories/RouteFactory';
+import { PrismaFlightsRepository } from '../repository/PrismaFlightsRepository';
+import { PrismaAirlinesRepository } from '../repository/PrismaAirlinesRepository';
+import { PrismaAirportsRepository } from '../repository/PrismaAirportsRepository';
+import { PrismaItinerariesRepository } from '../repository/PrismaItinerariesRepository';
+import { CreateFlight } from '../useCases/flight/CreateFlight';
+import { GetFlightById } from '../useCases/flight/GetFlightById';
+import { UpdateFlight } from '../useCases/flight/UpdateFlight';
+import { DeleteFlight } from '../useCases/flight/DeleteFlight';
+import { ListFlights } from '../useCases/flight/ListFlights';
+import { FlightController } from '../controllers/FlightController';
+import { CreateAirline } from '../useCases/airline/CreateAirline';
+import { GetAirlineById } from '../useCases/airline/GetAirlineById';
+import { UpdateAirline } from '../useCases/airline/UpdateAirline';
+import { DeleteAirline } from '../useCases/airline/DeleteAirline';
+import { ListAirlines } from '../useCases/airline/ListAirlines';
+import { AirlineController } from '../controllers/AirlineController';
+import { CreateAirport } from '../useCases/airport/CreateAirport';
+import { GetAirportById } from '../useCases/airport/GetAirportById';
+import { UpdateAirport } from '../useCases/airport/UpdateAirport';
+import { DeleteAirport } from '../useCases/airport/DeleteAirport';
+import { ListAirports } from '../useCases/airport/ListAirports';
+import { AirportController } from '../controllers/AirportController';
+import { ListItineraries } from '../useCases/itinerary/ListItineraries';
+import { CreateItinerary } from '../useCases/itinerary/CreateItinerary';
+import { GetItineraryById } from '../useCases/itinerary/GetItineraryById';
+import { DeleteItinerary } from '../useCases/itinerary/DeleteItinerary';
+import { ItineraryController } from '../controllers/ItineraryController';
 
 type Constructor<T> = new (...args: any[]) => T;
 type DependencyResolver<T> = () => T;
@@ -79,6 +110,10 @@ export class Container implements IContainer {
   private registerDefaultServices(): void {
     // Register repositories
     this.register('IUsersRepository', PrismaUsersRepository);
+    this.register('IFlightsRepository', PrismaFlightsRepository);
+    this.register('IAirlinesRepository', PrismaAirlinesRepository);
+    this.register('IAirportsRepository', PrismaAirportsRepository);
+    this.register('IItinerariesRepository', PrismaItinerariesRepository);
 
     // Register services
     this.registerFactory('IAuthService', () => {
@@ -110,6 +145,33 @@ export class Container implements IContainer {
       return new GetUserProfile(usersRepository);
     });
 
+    // Register use cases - Flight
+    this.registerFactory('CreateFlight', () => new CreateFlight(this.resolve('IFlightsRepository')));
+    this.registerFactory('GetFlightById', () => new GetFlightById(this.resolve('IFlightsRepository')));
+    this.registerFactory('UpdateFlight', () => new UpdateFlight(this.resolve('IFlightsRepository')));
+    this.registerFactory('DeleteFlight', () => new DeleteFlight(this.resolve('IFlightsRepository')));
+    this.registerFactory('ListFlights', () => new ListFlights(this.resolve('IFlightsRepository')));
+
+    // Register use cases - Airline
+    this.registerFactory('CreateAirline', () => new CreateAirline(this.resolve('IAirlinesRepository')));
+    this.registerFactory('GetAirlineById', () => new GetAirlineById(this.resolve('IAirlinesRepository')));
+    this.registerFactory('UpdateAirline', () => new UpdateAirline(this.resolve('IAirlinesRepository')));
+    this.registerFactory('DeleteAirline', () => new DeleteAirline(this.resolve('IAirlinesRepository')));
+    this.registerFactory('ListAirlines', () => new ListAirlines(this.resolve('IAirlinesRepository')));
+
+    // Register use cases - Airport
+    this.registerFactory('CreateAirport', () => new CreateAirport(this.resolve('IAirportsRepository')));
+    this.registerFactory('GetAirportById', () => new GetAirportById(this.resolve('IAirportsRepository')));
+    this.registerFactory('UpdateAirport', () => new UpdateAirport(this.resolve('IAirportsRepository')));
+    this.registerFactory('DeleteAirport', () => new DeleteAirport(this.resolve('IAirportsRepository')));
+    this.registerFactory('ListAirports', () => new ListAirports(this.resolve('IAirportsRepository')));
+
+    // Register use cases - Itinerary
+    this.registerFactory('ListItineraries', () => new ListItineraries(this.resolve('IItinerariesRepository')));
+    this.registerFactory('CreateItinerary', () => new CreateItinerary(this.resolve('IItinerariesRepository'), this.resolve('IFlightsRepository')));
+    this.registerFactory('GetItineraryById', () => new GetItineraryById(this.resolve('IItinerariesRepository')));
+    this.registerFactory('DeleteItinerary', () => new DeleteItinerary(this.resolve('IItinerariesRepository')));
+
     // Register controllers
     this.registerFactory('IAuthController', () => {
       const registerUser = this.resolve<RegisterUser>('IRegisterUserUseCase');
@@ -122,6 +184,37 @@ export class Container implements IContainer {
       const getUserProfile = this.resolve<GetUserProfile>('IGetUserProfileUseCase');
       return new UserController(getUserProfile);
     });
+
+    this.registerFactory('FlightController', () => new FlightController(
+      this.resolve('CreateFlight'),
+      this.resolve('GetFlightById'),
+      this.resolve('UpdateFlight'),
+      this.resolve('DeleteFlight'),
+      this.resolve('ListFlights')
+    ));
+
+    this.registerFactory('AirlineController', () => new AirlineController(
+      this.resolve('CreateAirline'),
+      this.resolve('GetAirlineById'),
+      this.resolve('UpdateAirline'),
+      this.resolve('DeleteAirline'),
+      this.resolve('ListAirlines')
+    ));
+
+    this.registerFactory('AirportController', () => new AirportController(
+      this.resolve('CreateAirport'),
+      this.resolve('GetAirportById'),
+      this.resolve('UpdateAirport'),
+      this.resolve('DeleteAirport'),
+      this.resolve('ListAirports')
+    ));
+
+    this.registerFactory('ItineraryController', () => new ItineraryController(
+      this.resolve('ListItineraries'),
+      this.resolve('CreateItinerary'),
+      this.resolve('GetItineraryById'),
+      this.resolve('DeleteItinerary')
+    ));
 
     // Register factories
     this.register('IRouteFactory', RouteFactory);
