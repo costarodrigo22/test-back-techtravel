@@ -22,35 +22,6 @@ export interface AuthResponse {
 export class AuthService implements IAuthService {
   constructor(private usersRepository: IUsersRepository) {}
 
-  async register(name: string, email: string, password: string, gender: string): Promise<AuthResponse> {
-    // Verificar se o usuário já existe
-    const existingUser = await this.usersRepository.findByEmail(email);
-    if (existingUser) {
-      throw new Error('Usuário já existe com este email');
-    }
-
-    // Hash da senha
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Criar usuário
-    const user = new User(name, email, hashedPassword, gender as any);
-    await this.usersRepository.create(user);
-
-    // Gerar tokens
-    const accessToken = this.generateAccessToken(user);
-    const refreshToken = this.generateRefreshToken(user);
-
-    return {
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
-      accessToken,
-      refreshToken,
-    };
-  }
-
   async login(email: string, password: string): Promise<AuthResponse> {
     // Buscar usuário
     const user = await this.usersRepository.findByEmail(email);

@@ -170,7 +170,7 @@ export class Container implements IContainer {
     this.registerFactory('DeleteItinerary', () => new DeleteItinerary(this.resolve('IItinerariesRepository')));
 
     // Register use cases - Availability
-    this.registerFactory('SearchAvailability', () => new SearchAvailability(this.resolve('IFlightsRepository'), this.resolve('IItinerariesRepository')));
+    this.registerFactory('SearchAvailability', () => new SearchAvailability(this.resolve('IItinerariesRepository')));
 
     // Register use cases - Booking
     this.registerFactory('CreateBooking', () => new CreateBooking(this.resolve('IBookingsRepository'), this.resolve('IUsersRepository'), this.resolve('IItinerariesRepository')));

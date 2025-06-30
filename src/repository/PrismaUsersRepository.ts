@@ -39,29 +39,7 @@ export class PrismaUsersRepository implements IUsersRepository {
     return this.mapPrismaUserToUser(prismaUser);
   }
 
-  async update(user: User): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        gender: user.gender as any,
-        updatedAt: user.updatedAt,
-      },
-    });
-  }
 
-  async delete(id: string): Promise<void> {
-    await this.prisma.user.delete({
-      where: { id },
-    });
-  }
-
-  async list(): Promise<User[]> {
-    const prismaUsers = await this.prisma.user.findMany();
-    return prismaUsers.map((user: any) => this.mapPrismaUserToUser(user));
-  }
 
   private mapPrismaUserToUser(prismaUser: any): User {
     const user = new User(

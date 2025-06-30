@@ -1,4 +1,3 @@
-import { IFlightsRepository } from '../../interfaces/repositories/IFlightsRepository';
 import { IItinerariesRepository } from '../../interfaces/repositories/IItinerariesRepository';
 import { Itinerary } from '../../entities/Itinerary';
 
@@ -20,7 +19,6 @@ export class SearchAvailability {
   private readonly MAX_ITINERARIES = 10;
 
   constructor(
-    private flightsRepository: IFlightsRepository,
     private itinerariesRepository: IItinerariesRepository
   ) {}
 
