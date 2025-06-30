@@ -9,10 +9,7 @@
     "dev": "ts-node src/app.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:build": "docker-compose build"
+    "prisma:studio": "prisma studio"
   },
   "keywords": [
     "travel",

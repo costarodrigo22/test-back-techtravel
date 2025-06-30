@@ -2,7 +2,7 @@
 
 ## 🏗️ Visão Geral
 
-Este projeto implementa os princípios da **Clean Architecture** com foco em **Inversion of Control (IoC)**, **Dependency Injection (DI)** e **Dependency Inversion Principle (DIP)**. A estrutura foi organizada para maximizar a testabilidade, manutenibilidade e flexibilidade do código.
+Este projeto implementa os princípios da **Clean Architecture** de Robert C. Martin com foco em **Inversion of Control (IoC)**, **Dependency Injection (DI)** e **Dependency Inversion Principle (DIP)**. A estrutura foi organizada para maximizar a testabilidade, manutenibilidade e flexibilidade do código.
 
 ## 📁 Estrutura de Interfaces
 
@@ -14,18 +14,25 @@ src/interfaces/
 │   ├── IAuthController.ts # Interface do controller de auth
 │   └── IUserController.ts # Interface do controller de usuário
 ├── repositories/           # Contratos dos repositórios
-│   └── IUsersRepository.ts # Interface do repositório de usuários
+│   ├── IAirlinesRepository.ts
+│   ├── IAirportsRepository.ts
+│   ├── IBookingsRepository.ts
+│   ├── IFlightsRepository.ts
+│   ├── IItinerariesRepository.ts
+│   └── IUsersRepository.ts
 ├── routes/                 # Contratos das rotas
 │   └── IRouteFactory.ts   # Interface da factory de rotas
 ├── services/               # Contratos dos serviços
 │   └── IAuthService.ts    # Interface do serviço de auth
 └── useCases/               # Contratos dos casos de uso
+    ├── airline/           # Casos de uso de companhias aéreas
+    ├── airport/           # Casos de uso de aeroportos
     ├── auth/              # Casos de uso de autenticação
-    │   ├── IRegisterUserUseCase.ts
-    │   ├── ILoginUserUseCase.ts
-    │   └── IRefreshTokenUseCase.ts
+    ├── availability/      # Casos de uso de disponibilidade
+    ├── booking/           # Casos de uso de reservas
+    ├── flight/            # Casos de uso de voos
+    ├── itinerary/         # Casos de uso de itinerários
     └── user/              # Casos de uso de usuário
-        └── IGetUserProfileUseCase.ts
 ```
 
 ## 🔄 Princípios Implementados
@@ -136,6 +143,11 @@ export class Container implements IContainer {
 private registerDefaultServices(): void {
   // Repositories
   this.register('IUsersRepository', PrismaUsersRepository);
+  this.register('IFlightsRepository', PrismaFlightsRepository);
+  this.register('IAirlinesRepository', PrismaAirlinesRepository);
+  this.register('IAirportsRepository', PrismaAirportsRepository);
+  this.register('IItinerariesRepository', PrismaItinerariesRepository);
+  this.register('IBookingsRepository', PrismaBookingsRepository);
 
   // Services com dependências
   this.registerFactory('IAuthService', () => {
@@ -149,6 +161,41 @@ private registerDefaultServices(): void {
     const authService = this.resolve<IAuthService>('IAuthService');
     return new RegisterUser(usersRepository, authService);
   });
+
+  // Use Cases - Flight
+  this.registerFactory('CreateFlight', () => new CreateFlight(this.resolve('IFlightsRepository')));
+  this.registerFactory('GetFlightById', () => new GetFlightById(this.resolve('IFlightsRepository')));
+  this.registerFactory('UpdateFlight', () => new UpdateFlight(this.resolve('IFlightsRepository')));
+  this.registerFactory('DeleteFlight', () => new DeleteFlight(this.resolve('IFlightsRepository')));
+  this.registerFactory('ListFlights', () => new ListFlights(this.resolve('IFlightsRepository')));
+
+  // Use Cases - Airline
+  this.registerFactory('CreateAirline', () => new CreateAirline(this.resolve('IAirlinesRepository')));
+  this.registerFactory('GetAirlineById', () => new GetAirlineById(this.resolve('IAirlinesRepository')));
+  this.registerFactory('UpdateAirline', () => new UpdateAirline(this.resolve('IAirlinesRepository')));
+  this.registerFactory('DeleteAirline', () => new DeleteAirline(this.resolve('IAirlinesRepository')));
+  this.registerFactory('ListAirlines', () => new ListAirlines(this.resolve('IAirlinesRepository')));
+
+  // Use Cases - Airport
+  this.registerFactory('CreateAirport', () => new CreateAirport(this.resolve('IAirportsRepository')));
+  this.registerFactory('GetAirportById', () => new GetAirportById(this.resolve('IAirportsRepository')));
+  this.registerFactory('UpdateAirport', () => new UpdateAirport(this.resolve('IAirportsRepository')));
+  this.registerFactory('DeleteAirport', () => new DeleteAirport(this.resolve('IAirportsRepository')));
+  this.registerFactory('ListAirports', () => new ListAirports(this.resolve('IAirportsRepository')));
+
+  // Use Cases - Itinerary
+  this.registerFactory('ListItineraries', () => new ListItineraries(this.resolve('IItinerariesRepository')));
+  this.registerFactory('CreateItinerary', () => new CreateItinerary(this.resolve('IItinerariesRepository'), this.resolve('IFlightsRepository')));
+  this.registerFactory('GetItineraryById', () => new GetItineraryById(this.resolve('IItinerariesRepository')));
+  this.registerFactory('DeleteItinerary', () => new DeleteItinerary(this.resolve('IItinerariesRepository')));
+
+  // Use Cases - Availability
+  this.registerFactory('SearchAvailability', () => new SearchAvailability(this.resolve('IItinerariesRepository')));
+
+  // Use Cases - Booking
+  this.registerFactory('CreateBooking', () => new CreateBooking(this.resolve('IBookingsRepository'), this.resolve('IUsersRepository'), this.resolve('IItinerariesRepository')));
+  this.registerFactory('GetUserBookings', () => new GetUserBookings(this.resolve('IBookingsRepository'), this.resolve('IUsersRepository')));
+  this.registerFactory('CancelBooking', () => new CancelBooking(this.resolve('IBookingsRepository')));
 }
 ```
 
@@ -199,130 +246,161 @@ Container.resolve('IAuthController')
 Resolve IRegisterUserUseCase
   ↓
 Resolve IUsersRepository (PrismaUsersRepository)
+  ↓
 Resolve IAuthService (AuthService)
   ↓
-Cria RegisterUser com dependências injetadas
-  ↓
-Retorna AuthController com use cases injetados
+Instância criada e retornada
 ```
 
-## 📋 Interfaces Implementadas
+## 🏛️ Casos de Uso Implementados
 
-### **Repositories**
-```typescript
-export interface IUsersRepository {
-  create(user: User): Promise<void>;
-  findById(id: string): Promise<User | null>;
-  findByEmail(email: string): Promise<User | null>;
-  update(user: User): Promise<void>;
-  delete(id: string): Promise<void>;
-  list(): Promise<User[]>;
-  findByDepartment(department: string): Promise<User[]>;
-}
-```
+### **Autenticação**
+- **RegisterUser**: Cadastro de usuário com validações
+- **LoginUser**: Autenticação com JWT
+- **RefreshToken**: Renovação de tokens
 
-### **Use Cases**
-```typescript
-export interface IRegisterUserUseCase {
-  execute(request: RegisterUserRequest): Promise<RegisterUserResponse>;
-}
+### **Usuários**
+- **GetUserProfile**: Obter perfil do usuário autenticado
 
-export interface ILoginUserUseCase {
-  execute(request: LoginUserRequest): Promise<LoginUserResponse>;
-}
-```
+### **Companhias Aéreas**
+- **CreateAirline**: Criar companhia aérea
+- **GetAirlineById**: Buscar companhia por ID
+- **ListAirlines**: Listar todas as companhias
+- **UpdateAirline**: Atualizar dados da companhia
+- **DeleteAirline**: Remover companhia
 
-### **Services**
-```typescript
-export interface IAuthService {
-  login(email: string, password: string): Promise<AuthResponse>;
-  refreshToken(refreshToken: string): Promise<{ accessToken: string }>;
-  verifyToken(token: string): TokenPayload;
-  generateAccessToken(user: User): string;
-  generateRefreshToken(user: User): string;
-}
-```
+### **Aeroportos**
+- **CreateAirport**: Criar aeroporto
+- **GetAirportById**: Buscar aeroporto por ID
+- **ListAirports**: Listar todos os aeroportos
+- **UpdateAirport**: Atualizar dados do aeroporto
+- **DeleteAirport**: Remover aeroporto
 
-### **Controllers**
-```typescript
-export interface IAuthController {
-  register(req: Request, res: Response): Promise<void>;
-  login(req: Request, res: Response): Promise<void>;
-  refreshToken(req: Request, res: Response): Promise<void>;
-}
-```
+### **Voos**
+- **CreateFlight**: Criar voo com validações
+- **GetFlightById**: Buscar voo por ID
+- **ListFlights**: Listar voos com filtros
+- **UpdateFlight**: Atualizar dados do voo
+- **DeleteFlight**: Remover voo
 
-## 🎯 Vantagens da Arquitetura
+### **Itinerários**
+- **CreateItinerary**: Criar itinerário composto por voos
+- **GetItineraryById**: Buscar itinerário por ID
+- **ListItineraries**: Listar itinerários
+- **DeleteItinerary**: Remover itinerário
 
-### **1. Flexibilidade**
+### **Disponibilidade**
+- **SearchAvailability**: Buscar disponibilidade de voos com filtros
+
+### **Reservas**
+- **CreateBooking**: Criar reserva para usuário
+- **GetUserBookings**: Listar reservas de um usuário
+- **CancelBooking**: Cancelar reserva (soft delete)
+
+## 🎯 Benefícios da Arquitetura
+
+### **1. Separação de Responsabilidades**
+- **Controllers**: Lidam apenas com HTTP
+- **Use Cases**: Contêm a lógica de negócio
+- **Repositories**: Acessam dados
+- **Entities**: Representam o domínio
+
+### **2. Testabilidade**
+- Cada camada pode ser testada independentemente
+- Mocks fáceis de criar
+- Testes isolados e rápidos
+
+### **3. Manutenibilidade**
+- Código organizado e legível
+- Responsabilidades claras
+- Fácil de entender e modificar
+
+### **4. Flexibilidade**
 - Fácil troca de implementações
 - Configuração por ambiente
 - Plugins e extensões
 
-### **2. Testabilidade**
-- Mocks simples de criar
-- Testes isolados
-- Cobertura completa
-
-### **3. Manutenibilidade**
-- Código organizado
-- Responsabilidades claras
-- Fácil de entender
-
-### **4. Escalabilidade**
+### **5. Escalabilidade**
 - Novos módulos fáceis de adicionar
 - Dependências gerenciadas
 - Arquitetura consistente
 
-## 🔧 Como Adicionar Novos Serviços
+## 🔧 Como Adicionar Novos Casos de Uso
 
-### **1. Criar Interface**
+### **1. Criar a Interface**
 ```typescript
-// src/interfaces/services/INewService.ts
-export interface INewService {
-  doSomething(): Promise<void>;
+// interfaces/useCases/meuModulo/IMeuCasoDeUso.ts
+export interface IMeuCasoDeUsoRequest {
+  campo1: string;
+  campo2: number;
+}
+
+export interface IMeuCasoDeUsoResponse {
+  resultado: string;
+}
+
+export interface IMeuCasoDeUso {
+  execute(request: IMeuCasoDeUsoRequest): Promise<IMeuCasoDeUsoResponse>;
 }
 ```
 
-### **2. Implementar Serviço**
+### **2. Implementar o Caso de Uso**
 ```typescript
-// src/services/NewService.ts
-export class NewService implements INewService {
-  constructor(private dependency: IDependency) {}
-  
-  async doSomething(): Promise<void> {
-    // Implementação
+// useCases/meuModulo/MeuCasoDeUso.ts
+export class MeuCasoDeUso implements IMeuCasoDeUso {
+  constructor(
+    private repository: IMeuRepository
+  ) {}
+
+  async execute(request: IMeuCasoDeUsoRequest): Promise<IMeuCasoDeUsoResponse> {
+    // Lógica de negócio aqui
+    return { resultado: 'sucesso' };
   }
 }
 ```
 
 ### **3. Registrar no Container**
 ```typescript
-// src/di/Container.ts
-private registerDefaultServices(): void {
-  // ... outros registros
-  
-  this.registerFactory('INewService', () => {
-    const dependency = this.resolve<IDependency>('IDependency');
-    return new NewService(dependency);
-  });
+// di/Container.ts
+this.registerFactory('IMeuCasoDeUso', () => 
+  new MeuCasoDeUso(this.resolve('IMeuRepository'))
+);
+```
+
+### **4. Criar o Controller**
+```typescript
+// controllers/MeuController.ts
+export class MeuController {
+  constructor(
+    private meuCasoDeUso: IMeuCasoDeUso
+  ) {}
+
+  async meuMetodo(req: Request, res: Response) {
+    const result = await this.meuCasoDeUso.execute(req.body);
+    return res.json(result);
+  }
 }
 ```
 
-### **4. Usar no Código**
+### **5. Adicionar as Rotas**
 ```typescript
-// Em qualquer lugar da aplicação
-const newService = container.resolve<INewService>('INewService');
-await newService.doSomething();
+// factories/RouteFactory.ts
+createMeuRotas(controller: MeuController): Router {
+  const router = Router();
+  router.post('/meu-endpoint', (req, res) => controller.meuMetodo(req, res));
+  return router;
+}
 ```
 
-## 🚀 Próximos Passos
+## 📚 Conclusão
 
-1. **Implementar validação** com decorators
-2. **Adicionar logs** estruturados
-3. **Implementar cache** com interfaces
-4. **Criar testes** unitários completos
-5. **Adicionar métricas** e monitoramento
-6. **Implementar rate limiting** com interfaces
+A implementação da Clean Architecture com IoC e DI neste projeto proporciona:
 
+- **Código limpo e organizado**
+- **Fácil manutenção e evolução**
+- **Testabilidade excepcional**
+- **Flexibilidade para mudanças**
+- **Escalabilidade para crescimento**
+
+Esta arquitetura permite que o sistema cresça de forma sustentável, mantendo a qualidade do código e facilitando a adição de novas funcionalidades. 
 Esta arquitetura garante que o código seja **testável**, **manutenível** e **escalável**, seguindo os princípios da Clean Architecture! 🎉 
