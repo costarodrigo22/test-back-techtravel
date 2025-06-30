@@ -174,8 +174,7 @@ Cadastrar novo usuário.
   "user": {
     "id": "uuid",
     "name": "João Silva",
-    "email": "joao@empresa.com",
-    "role": "EMPLOYEE"
+    "email": "joao@empresa.com"
   },
   "accessToken": "jwt_token",
   "refreshToken": "refresh_token"

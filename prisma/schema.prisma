@@ -20,11 +20,9 @@ model User {
   email     String   @unique
   password  String
   gender    Gender
-  role      Role     @default(EMPLOYEE)
-  department String?
-  employeeId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  bookings  Booking[]
 
   @@map("users")
 }
@@ -35,8 +33,65 @@ enum Gender {
   OTHER
 }
 
-enum Role {
-  EMPLOYEE
-  MANAGER
-  ADMIN
+model Airline {
+  id        String   @id @default(uuid())
+  name      String
+  iata_code String   @unique
+  flights   Flight[]
+}
+
+model Airport {
+  id        String   @id @default(uuid())
+  name      String
+  iata_code String   @unique
+  originFlights      Flight[] @relation("OriginAirport")
+  destinationFlights Flight[] @relation("DestinationAirport")
+}
+
+model Flight {
+  id                String   @id @default(uuid())
+  flight_number     String
+  airline_id        String
+  origin_iata       String
+  destination_iata  String
+  departure_datetime DateTime
+  arrival_datetime   DateTime
+  frequency         Int[]
+
+  airline           Airline  @relation(fields: [airline_id], references: [id])
+  originAirport     Airport  @relation("OriginAirport", fields: [origin_iata], references: [iata_code])
+  destinationAirport Airport @relation("DestinationAirport", fields: [destination_iata], references: [iata_code])
+  itineraries       ItineraryFlight[]
+}
+
+model Itinerary {
+  id        String   @id @default(uuid())
+  flights   ItineraryFlight[]
+  bookings  Booking[]
+}
+
+model ItineraryFlight {
+  id         String  @id @default(uuid())
+  itinerary  Itinerary @relation(fields: [itineraryId], references: [id])
+  itineraryId String
+  flight     Flight    @relation(fields: [flightId], references: [id])
+  flightId   String
+  order      Int
+
+  @@unique([itineraryId, order])
+}
+
+model Booking {
+  id           String   @id @default(uuid())
+  user_id      String
+  itinerary_id String
+  status       BookingStatus
+
+  user         User      @relation(fields: [user_id], references: [id])
+  itinerary    Itinerary @relation(fields: [itinerary_id], references: [id])
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
 }

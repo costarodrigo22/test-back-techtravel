@@ -13,7 +13,6 @@ export interface LoginUserResponse {
     id: string;
     name: string;
     email: string;
-    role: string;
   };
   accessToken: string;
   refreshToken: string;
@@ -50,7 +49,6 @@ export class LoginUser implements ILoginUserUseCase {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role,
       },
       accessToken,
       refreshToken,

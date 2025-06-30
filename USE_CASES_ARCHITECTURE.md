@@ -56,7 +56,6 @@ Response ← Response ← Entity ← Prisma
     id: string;
     name: string;
     email: string;
-    role: string;
   };
   accessToken: string;
   refreshToken: string;
@@ -88,7 +87,6 @@ Response ← Response ← Entity ← Prisma
     id: string;
     name: string;
     email: string;
-    role: string;
   };
   accessToken: string;
   refreshToken: string;
@@ -139,9 +137,6 @@ Response ← Response ← Entity ← Prisma
   name: string;
   email: string;
   gender: string;
-  role: string;
-  department?: string;
-  employeeId?: string;
   createdAt: Date;
   updatedAt: Date;
 }

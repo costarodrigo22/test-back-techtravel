@@ -7,7 +7,6 @@ import { IAuthService } from '../interfaces/services/IAuthService';
 export interface TokenPayload {
   userId: string;
   email: string;
-  role: string;
 }
 
 export interface AuthResponse {
@@ -15,7 +14,6 @@ export interface AuthResponse {
     id: string;
     name: string;
     email: string;
-    role: string;
   };
   accessToken: string;
   refreshToken: string;
@@ -47,7 +45,6 @@ export class AuthService implements IAuthService {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role,
       },
       accessToken,
       refreshToken,
@@ -76,7 +73,6 @@ export class AuthService implements IAuthService {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role,
       },
       accessToken,
       refreshToken,
@@ -112,7 +108,6 @@ export class AuthService implements IAuthService {
     const payload: TokenPayload = {
       userId: user.id,
       email: user.email,
-      role: user.role,
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET!);
@@ -122,7 +117,6 @@ export class AuthService implements IAuthService {
     const payload: TokenPayload = {
       userId: user.id,
       email: user.email,
-      role: user.role,
     };
 
     return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!);

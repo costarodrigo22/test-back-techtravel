@@ -1,5 +1,5 @@
 import { PrismaClient } from '../generated/prisma';
-import { User, UserRole, UserGender } from '../entities/User';
+import { User, UserGender } from '../entities/User';
 import { IUsersRepository } from '../interfaces/repositories/IUsersRepository';
 
 export class PrismaUsersRepository implements IUsersRepository {
@@ -13,9 +13,8 @@ export class PrismaUsersRepository implements IUsersRepository {
         email: user.email,
         password: user.password,
         gender: user.gender as any,
-        role: user.role as any,
-        department: user.department,
-        employeeId: user.employeeId,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
     });
   }
@@ -48,9 +47,7 @@ export class PrismaUsersRepository implements IUsersRepository {
         email: user.email,
         password: user.password,
         gender: user.gender as any,
-        role: user.role as any,
-        department: user.department,
-        employeeId: user.employeeId,
+        updatedAt: user.updatedAt,
       },
     });
   }
@@ -66,22 +63,12 @@ export class PrismaUsersRepository implements IUsersRepository {
     return prismaUsers.map((user: any) => this.mapPrismaUserToUser(user));
   }
 
-  async findByDepartment(department: string): Promise<User[]> {
-    const prismaUsers = await this.prisma.user.findMany({
-      where: { department },
-    });
-    return prismaUsers.map((user: any) => this.mapPrismaUserToUser(user));
-  }
-
   private mapPrismaUserToUser(prismaUser: any): User {
     const user = new User(
       prismaUser.name,
       prismaUser.email,
       prismaUser.password,
-      prismaUser.gender as UserGender,
-      prismaUser.role as UserRole,
-      prismaUser.department || undefined,
-      prismaUser.employeeId || undefined
+      prismaUser.gender as UserGender
     );
     
     user.id = prismaUser.id;

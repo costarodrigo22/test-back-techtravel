@@ -10,9 +10,6 @@ export interface GetUserProfileResponse {
   name: string;
   email: string;
   gender: string;
-  role: string;
-  department?: string;
-  employeeId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,9 +33,6 @@ export class GetUserProfile implements IGetUserProfileUseCase {
       name: user.name,
       email: user.email,
       gender: user.gender,
-      role: user.role,
-      department: user.department,
-      employeeId: user.employeeId,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

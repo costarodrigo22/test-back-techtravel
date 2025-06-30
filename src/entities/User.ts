@@ -1,11 +1,5 @@
 import { randomUUID } from 'node:crypto';
 
-export enum UserRole {
-  EMPLOYEE = 'EMPLOYEE',
-  MANAGER = 'MANAGER',
-  ADMIN = 'ADMIN'
-}
-
 export enum UserGender {
   MALE = 'MALE',
   FEMALE = 'FEMALE',
@@ -14,19 +8,24 @@ export enum UserGender {
 
 export class User {
   public id: string;
+  public name: string;
+  public email: string;
+  public password: string;
+  public gender: UserGender;
   public createdAt: Date;
   public updatedAt: Date;
 
   constructor(
-    public name: string,
-    public email: string,
-    public password: string,
-    public gender: UserGender,
-    public role: UserRole = UserRole.EMPLOYEE,
-    public department?: string,
-    public employeeId?: string
+    name: string,
+    email: string,
+    password: string,
+    gender: UserGender
   ) {
     this.id = randomUUID();
+    this.name = name;
+    this.email = email;
+    this.password = password;
+    this.gender = gender;
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
