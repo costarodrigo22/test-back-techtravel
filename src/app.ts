@@ -28,6 +28,12 @@ import { GetAirportById } from './useCases/airport/GetAirportById';
 import { UpdateAirport } from './useCases/airport/UpdateAirport';
 import { DeleteAirport } from './useCases/airport/DeleteAirport';
 import { ListAirports } from './useCases/airport/ListAirports';
+import { PrismaItinerariesRepository } from './repository/PrismaItinerariesRepository';
+import { ListItineraries } from './useCases/itinerary/ListItineraries';
+import { ItineraryController } from './controllers/ItineraryController';
+import { CreateItinerary } from './useCases/itinerary/CreateItinerary';
+import { GetItineraryById } from './useCases/itinerary/GetItineraryById';
+import { DeleteItinerary } from './useCases/itinerary/DeleteItinerary';
 
 dotenv.config();
 
@@ -85,6 +91,13 @@ const airportController = new AirportController(
   deleteAirport,
   listAirports
 );
+const itinerariesRepository = new PrismaItinerariesRepository();
+const listItineraries = new ListItineraries(itinerariesRepository);
+const flightsRepositoryForItinerary = new PrismaFlightsRepository();
+const createItinerary = new CreateItinerary(itinerariesRepository, flightsRepositoryForItinerary);
+const getItineraryById = new GetItineraryById(itinerariesRepository);
+const deleteItinerary = new DeleteItinerary(itinerariesRepository);
+const itineraryController = new ItineraryController(listItineraries, createItinerary, getItineraryById, deleteItinerary);
 
 // Routes
 app.use('/auth', routeFactory.createAuthRoutes(authController));
@@ -92,6 +105,7 @@ app.use('/users', authMiddleware(authService), routeFactory.createUserRoutes(use
 app.use('/flights', authMiddleware(authService), routeFactory.createFlightRoutes(flightController));
 app.use('/airlines', authMiddleware(authService), routeFactory.createAirlineRoutes(airlineController));
 app.use('/airports', authMiddleware(authService), routeFactory.createAirportRoutes(airportController));
+app.use('/itineraries', authMiddleware(authService), routeFactory.createItineraryRoutes(itineraryController));
 
 // Health check
 app.get('/health', (req, res) => {

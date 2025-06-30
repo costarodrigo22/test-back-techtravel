@@ -5,6 +5,7 @@ import { IRouteFactory } from '../interfaces/routes/IRouteFactory';
 import { FlightController } from '../controllers/FlightController';
 import { AirlineController } from '../controllers/AirlineController';
 import { AirportController } from '../controllers/AirportController';
+import { ItineraryController } from '../controllers/ItineraryController';
 
 export class RouteFactory implements IRouteFactory {
   createAuthRoutes(authController: IAuthController): Router {
@@ -54,6 +55,15 @@ export class RouteFactory implements IRouteFactory {
     router.post('/', (req, res) => airportController.create(req, res));
     router.put('/:id', (req, res) => airportController.update(req, res));
     router.delete('/:id', (req, res) => airportController.delete(req, res));
+    return router;
+  }
+
+  createItineraryRoutes(itineraryController: ItineraryController): Router {
+    const router = Router();
+    router.get('/', (req, res) => itineraryController.list(req, res));
+    router.post('/', (req, res) => itineraryController.create(req, res));
+    router.get('/:id', (req, res) => itineraryController.get(req, res));
+    router.delete('/:id', (req, res) => itineraryController.delete(req, res));
     return router;
   }
 } 
