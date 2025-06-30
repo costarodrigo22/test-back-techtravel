@@ -13,6 +13,21 @@ import { PrismaAirlinesRepository } from './repository/PrismaAirlinesRepository'
 import { PrismaAirportsRepository } from './repository/PrismaAirportsRepository';
 import { AirlineController } from './controllers/AirlineController';
 import { AirportController } from './controllers/AirportController';
+import { CreateFlight } from './useCases/flight/CreateFlight';
+import { GetFlightById } from './useCases/flight/GetFlightById';
+import { UpdateFlight } from './useCases/flight/UpdateFlight';
+import { DeleteFlight } from './useCases/flight/DeleteFlight';
+import { ListFlights } from './useCases/flight/ListFlights';
+import { CreateAirline } from './useCases/airline/CreateAirline';
+import { GetAirlineById } from './useCases/airline/GetAirlineById';
+import { UpdateAirline } from './useCases/airline/UpdateAirline';
+import { DeleteAirline } from './useCases/airline/DeleteAirline';
+import { ListAirlines } from './useCases/airline/ListAirlines';
+import { CreateAirport } from './useCases/airport/CreateAirport';
+import { GetAirportById } from './useCases/airport/GetAirportById';
+import { UpdateAirport } from './useCases/airport/UpdateAirport';
+import { DeleteAirport } from './useCases/airport/DeleteAirport';
+import { ListAirports } from './useCases/airport/ListAirports';
 
 dotenv.config();
 
@@ -32,11 +47,44 @@ const userController = container.resolve<IUserController>('IUserController');
 const routeFactory = container.resolve<IRouteFactory>('IRouteFactory');
 const authService = container.resolve<IAuthService>('IAuthService');
 const flightsRepository = new PrismaFlightsRepository();
-const flightController = new FlightController(flightsRepository);
+const createFlight = new CreateFlight(flightsRepository);
+const getFlightById = new GetFlightById(flightsRepository);
+const updateFlight = new UpdateFlight(flightsRepository);
+const deleteFlight = new DeleteFlight(flightsRepository);
+const listFlights = new ListFlights(flightsRepository);
+const flightController = new FlightController(
+  createFlight,
+  getFlightById,
+  updateFlight,
+  deleteFlight,
+  listFlights
+);
 const airlinesRepository = new PrismaAirlinesRepository();
-const airlineController = new AirlineController(airlinesRepository);
+const createAirline = new CreateAirline(airlinesRepository);
+const getAirlineById = new GetAirlineById(airlinesRepository);
+const updateAirline = new UpdateAirline(airlinesRepository);
+const deleteAirline = new DeleteAirline(airlinesRepository);
+const listAirlines = new ListAirlines(airlinesRepository);
+const airlineController = new AirlineController(
+  createAirline,
+  getAirlineById,
+  updateAirline,
+  deleteAirline,
+  listAirlines
+);
 const airportsRepository = new PrismaAirportsRepository();
-const airportController = new AirportController(airportsRepository);
+const createAirport = new CreateAirport(airportsRepository);
+const getAirportById = new GetAirportById(airportsRepository);
+const updateAirport = new UpdateAirport(airportsRepository);
+const deleteAirport = new DeleteAirport(airportsRepository);
+const listAirports = new ListAirports(airportsRepository);
+const airportController = new AirportController(
+  createAirport,
+  getAirportById,
+  updateAirport,
+  deleteAirport,
+  listAirports
+);
 
 // Routes
 app.use('/auth', routeFactory.createAuthRoutes(authController));

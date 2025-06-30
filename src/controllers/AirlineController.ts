@@ -1,40 +1,76 @@
 import { Request, Response } from 'express';
-import { IAirlinesRepository } from '../interfaces/repositories/IAirlinesRepository';
-import { Airline } from '../entities/Airline';
-import { randomUUID } from 'crypto';
+import { CreateAirline } from '../useCases/airline/CreateAirline';
+import { GetAirlineById } from '../useCases/airline/GetAirlineById';
+import { UpdateAirline } from '../useCases/airline/UpdateAirline';
+import { DeleteAirline } from '../useCases/airline/DeleteAirline';
+import { ListAirlines } from '../useCases/airline/ListAirlines';
 
 export class AirlineController {
-  constructor(private airlinesRepository: IAirlinesRepository) {}
+  constructor(
+    private createAirline: CreateAirline,
+    private getAirlineById: GetAirlineById,
+    private updateAirline: UpdateAirline,
+    private deleteAirline: DeleteAirline,
+    private listAirlines: ListAirlines
+  ) {}
 
   async list(req: Request, res: Response) {
-    const airlines = await this.airlinesRepository.findAll();
-    return res.json(airlines);
+    try {
+      const airlines = await this.listAirlines.execute();
+      return res.json(airlines);
+    } catch (error) {
+      return res.status(500).json({ error: 'Erro ao listar companhias aéreas.' });
+    }
   }
 
   async get(req: Request, res: Response) {
-    const { id } = req.params;
-    const airline = await this.airlinesRepository.findById(id);
-    if (!airline) return res.status(404).json({ error: 'Companhia aérea não encontrada' });
-    return res.json(airline);
+    try {
+      const { id } = req.params;
+      const airline = await this.getAirlineById.execute(id);
+      if (!airline) return res.status(404).json({ error: 'Companhia aérea não encontrada.' });
+      return res.json(airline);
+    } catch (error) {
+      return res.status(500).json({ error: 'Erro ao buscar companhia aérea.' });
+    }
   }
 
   async create(req: Request, res: Response) {
     const { name, iata_code } = req.body;
-    const airline = new Airline(randomUUID(), name, iata_code);
-    const created = await this.airlinesRepository.create(airline);
-    return res.status(201).json(created);
+    if (!name || !iata_code) {
+      return res.status(400).json({ error: 'Nome e código IATA são obrigatórios.' });
+    }
+    try {
+      const created = await this.createAirline.execute({ name, iata_code });
+      return res.status(201).json(created);
+    } catch (error: any) {
+      if (error.code === 'P2002' && error.meta?.target?.includes('iata_code')) {
+        return res.status(409).json({ error: 'Já existe uma companhia aérea com esse código IATA.' });
+      }
+      return res.status(500).json({ error: 'Erro ao criar companhia aérea.' });
+    }
   }
 
   async update(req: Request, res: Response) {
-    const { id } = req.params;
-    const updated = await this.airlinesRepository.update(id, req.body);
-    if (!updated) return res.status(404).json({ error: 'Companhia aérea não encontrada' });
-    return res.json(updated);
+    try {
+      const { id } = req.params;
+      const updated = await this.updateAirline.execute(id, req.body);
+      if (!updated) return res.status(404).json({ error: 'Companhia aérea não encontrada.' });
+      return res.json(updated);
+    } catch (error: any) {
+      if (error.code === 'P2002' && error.meta?.target?.includes('iata_code')) {
+        return res.status(409).json({ error: 'Já existe uma companhia aérea com esse código IATA.' });
+      }
+      return res.status(500).json({ error: 'Erro ao atualizar companhia aérea.' });
+    }
   }
 
   async delete(req: Request, res: Response) {
-    const { id } = req.params;
-    await this.airlinesRepository.delete(id);
-    return res.status(204).send();
+    try {
+      const { id } = req.params;
+      await this.deleteAirline.execute(id);
+      return res.status(204).send();
+    } catch (error) {
+      return res.status(500).json({ error: 'Erro ao remover companhia aérea.' });
+    }
   }
 } 
