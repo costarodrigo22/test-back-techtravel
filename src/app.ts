@@ -13,6 +13,7 @@ import { AirportController } from './controllers/AirportController';
 import { ItineraryController } from './controllers/ItineraryController';
 import { AvailabilityController } from './controllers/AvailabilityController';
 import { BookingController } from './controllers/BookingController';
+import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
 
@@ -52,6 +53,9 @@ app.use('/users', authMiddleware(authService), routeFactory.createUserRoutes(use
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// Middleware global de erros (deve ser o último)
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
