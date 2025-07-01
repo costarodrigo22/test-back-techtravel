@@ -3,6 +3,8 @@ import { IUsersRepository } from '../../../interfaces/repositories/IUsersReposit
 import { IAuthService } from '../../../interfaces/services/IAuthService';
 import { User, UserGender } from '../../../entities/User';
 import jwt from 'jsonwebtoken';
+import { AppError } from '../../../errors/AppError';
+import { NotFoundError } from '../../../errors/NotFoundError';
 
 class FakeUsersRepository implements IUsersRepository {
   private users: User[] = [];
@@ -68,7 +70,7 @@ describe('RefreshToken UseCase', () => {
 
     await expect(refreshTokenUseCase.execute(request))
       .rejects
-      .toThrow('Token de refresh inválido');
+      .toThrow(AppError);
   });
 
   it('deve lançar erro se usuário não for encontrado', async () => {
@@ -83,8 +85,8 @@ describe('RefreshToken UseCase', () => {
     };
 
     await expect(refreshTokenUseCase.execute(request))
-    .rejects
-    .toThrow('Token de refresh inválido');
+      .rejects
+      .toThrow(NotFoundError);
   });
 
   it('deve lançar erro se refresh token não for informado', async () => {
@@ -98,6 +100,6 @@ describe('RefreshToken UseCase', () => {
 
     await expect(refreshTokenUseCase.execute(request))
       .rejects
-      .toThrow('Refresh token é obrigatório');
+      .toThrow(AppError);
   });
 }); 

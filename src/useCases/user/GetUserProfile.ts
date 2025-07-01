@@ -1,9 +1,14 @@
 import { IUsersRepository } from '../../interfaces/repositories/IUsersRepository';
 import { IGetUserProfileUseCase } from '../../interfaces/useCases/user/IGetUserProfileUseCase';
+import { AppError } from '../../errors/AppError';
+import { NotFoundError } from '../../errors/NotFoundError';
+import { z } from 'zod';
 
-export interface GetUserProfileRequest {
-  userId: string;
-}
+export const GetUserProfileSchema = z.object({
+  userId: z.string().min(1, 'ID do usuário é obrigatório'),
+});
+
+export type GetUserProfileRequest = z.infer<typeof GetUserProfileSchema>;
 
 export interface GetUserProfileResponse {
   id: string;
@@ -18,13 +23,17 @@ export class GetUserProfile implements IGetUserProfileUseCase {
   constructor(private usersRepository: IUsersRepository) {}
 
   async execute(request: GetUserProfileRequest): Promise<GetUserProfileResponse> {
-    // Validar dados de entrada
-    this.validateRequest(request);
+    // Validação centralizada com zod
+    const parsed = GetUserProfileSchema.safeParse(request);
+    if (!parsed.success) {
+      const message = parsed.error.errors.map(e => e.message).join('; ');
+      throw new AppError(message, 400);
+    }
 
     // Buscar usuário
     const user = await this.usersRepository.findById(request.userId);
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new NotFoundError('Usuário não encontrado');
     }
 
     // Retornar dados do usuário (sem a senha)
@@ -36,11 +45,5 @@ export class GetUserProfile implements IGetUserProfileUseCase {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
-  }
-
-  private validateRequest(request: GetUserProfileRequest): void {
-    if (!request.userId || request.userId.trim().length === 0) {
-      throw new Error('ID do usuário é obrigatório');
-    }
   }
 } 

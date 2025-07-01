@@ -2,10 +2,15 @@ import jwt from 'jsonwebtoken';
 import { IUsersRepository } from '../../interfaces/repositories/IUsersRepository';
 import { IAuthService } from '../../interfaces/services/IAuthService';
 import { IRefreshTokenUseCase } from '../../interfaces/useCases/auth/IRefreshTokenUseCase';
+import { AppError } from '../../errors/AppError';
+import { NotFoundError } from '../../errors/NotFoundError';
+import { z } from 'zod';
 
-export interface RefreshTokenRequest {
-  refreshToken: string;
-}
+export const RefreshTokenSchema = z.object({
+  refreshToken: z.string().min(1, 'Refresh token é obrigatório'),
+});
+
+export type RefreshTokenRequest = z.infer<typeof RefreshTokenSchema>;
 
 export interface RefreshTokenResponse {
   accessToken: string;
@@ -18,8 +23,12 @@ export class RefreshToken implements IRefreshTokenUseCase {
   ) {}
 
   async execute(request: RefreshTokenRequest): Promise<RefreshTokenResponse> {
-    // Validar dados de entrada
-    this.validateRequest(request);
+    // Validação centralizada com zod
+    const parsed = RefreshTokenSchema.safeParse(request);
+    if (!parsed.success) {
+      const message = parsed.error.errors.map(e => e.message).join('; ');
+      throw new AppError(message, 400);
+    }
 
     try {
       // Verificar e decodificar o refresh token
@@ -28,7 +37,7 @@ export class RefreshToken implements IRefreshTokenUseCase {
       // Buscar usuário
       const user = await this.usersRepository.findById(decoded.userId);
       if (!user) {
-        throw new Error('Usuário não encontrado');
+        throw new NotFoundError('Usuário não encontrado');
       }
 
       // Gerar novo access token
@@ -36,13 +45,10 @@ export class RefreshToken implements IRefreshTokenUseCase {
       
       return { accessToken: newAccessToken };
     } catch (error) {
-      throw new Error('Token de refresh inválido');
-    }
-  }
-
-  private validateRequest(request: RefreshTokenRequest): void {
-    if (!request.refreshToken || request.refreshToken.trim().length === 0) {
-      throw new Error('Refresh token é obrigatório');
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      throw new AppError('Token de refresh inválido', 401);
     }
   }
 } 

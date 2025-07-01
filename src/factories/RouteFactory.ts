@@ -20,9 +20,29 @@ export class RouteFactory implements IRouteFactory {
   createAuthRoutes(authController: IAuthController): Router {
     const router = Router();
 
-    router.post('/register', (req, res) => authController.register(req, res));
-    router.post('/login', (req, res) => authController.login(req, res));
-    router.post('/refresh', (req, res) => authController.refreshToken(req, res));
+    router.post('/register', async (req, res, next) => {
+      try {
+        await authController.register(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.post('/login', async (req, res, next) => {
+      try {
+        await authController.login(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.post('/refresh', async (req, res, next) => {
+      try {
+        await authController.refreshToken(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
 
     return router;
   }
@@ -30,10 +50,21 @@ export class RouteFactory implements IRouteFactory {
   createUserRoutes(userController: IUserController): Router {
     const router = Router();
 
-    router.get('/profile', (req, res) => userController.getProfile(req, res));
-    router.get('/:userId/bookings', (req, res) => {
-      const bookingController = this.container.resolve('BookingController') as BookingController;
-      return bookingController.listUserBookings(req, res);
+    router.get('/profile', async (req, res, next) => {
+      try {
+        await userController.getProfile(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.get('/:userId/bookings', async (req, res, next) => {
+      try {
+        const bookingController = this.container.resolve('BookingController') as BookingController;
+        await bookingController.listUserBookings(req, res);
+      } catch (error) {
+        next(error);
+      }
     });
 
     return router;
@@ -42,54 +73,212 @@ export class RouteFactory implements IRouteFactory {
   createFlightRoutes(flightController: FlightController): Router {
     const router = Router();
 
-    router.get('/', (req, res) => flightController.list(req, res));
-    router.get('/:id', (req, res) => flightController.get(req, res));
-    router.post('/', (req, res) => flightController.create(req, res));
-    router.put('/:id', (req, res) => flightController.update(req, res));
-    router.delete('/:id', (req, res) => flightController.delete(req, res));
+    router.get('/', async (req, res, next) => {
+      try {
+        await flightController.list(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.get('/:id', async (req, res, next) => {
+      try {
+        await flightController.get(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.post('/', async (req, res, next) => {
+      try {
+        await flightController.create(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.put('/:id', async (req, res, next) => {
+      try {
+        await flightController.update(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.delete('/:id', async (req, res, next) => {
+      try {
+        await flightController.delete(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
 
     return router;
   }
 
   createAirlineRoutes(airlineController: AirlineController): Router {
     const router = Router();
-    router.get('/', (req, res) => airlineController.list(req, res));
-    router.get('/:id', (req, res) => airlineController.get(req, res));
-    router.post('/', (req, res) => airlineController.create(req, res));
-    router.put('/:id', (req, res) => airlineController.update(req, res));
-    router.delete('/:id', (req, res) => airlineController.delete(req, res));
+    
+    router.get('/', async (req, res, next) => {
+      try {
+        await airlineController.list(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.get('/:id', async (req, res, next) => {
+      try {
+        await airlineController.get(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.post('/', async (req, res, next) => {
+      try {
+        await airlineController.create(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.put('/:id', async (req, res, next) => {
+      try {
+        await airlineController.update(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.delete('/:id', async (req, res, next) => {
+      try {
+        await airlineController.delete(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
     return router;
   }
 
   createAirportRoutes(airportController: AirportController): Router {
     const router = Router();
-    router.get('/', (req, res) => airportController.list(req, res));
-    router.get('/:id', (req, res) => airportController.get(req, res));
-    router.post('/', (req, res) => airportController.create(req, res));
-    router.put('/:id', (req, res) => airportController.update(req, res));
-    router.delete('/:id', (req, res) => airportController.delete(req, res));
+    
+    router.get('/', async (req, res, next) => {
+      try {
+        await airportController.list(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.get('/:id', async (req, res, next) => {
+      try {
+        await airportController.get(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.post('/', async (req, res, next) => {
+      try {
+        await airportController.create(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.put('/:id', async (req, res, next) => {
+      try {
+        await airportController.update(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.delete('/:id', async (req, res, next) => {
+      try {
+        await airportController.delete(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
     return router;
   }
 
   createItineraryRoutes(itineraryController: ItineraryController): Router {
     const router = Router();
-    router.get('/', (req, res) => itineraryController.list(req, res));
-    router.post('/', (req, res) => itineraryController.create(req, res));
-    router.get('/:id', (req, res) => itineraryController.get(req, res));
-    router.delete('/:id', (req, res) => itineraryController.delete(req, res));
+    
+    router.get('/', async (req, res, next) => {
+      try {
+        await itineraryController.list(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.post('/', async (req, res, next) => {
+      try {
+        await itineraryController.create(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.get('/:id', async (req, res, next) => {
+      try {
+        await itineraryController.get(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.delete('/:id', async (req, res, next) => {
+      try {
+        await itineraryController.delete(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
     return router;
   }
 
   createAvailabilityRoutes(availabilityController: AvailabilityController): Router {
     const router = Router();
-    router.post('/search', (req, res) => availabilityController.search(req, res));
+    
+    router.post('/search', async (req, res, next) => {
+      try {
+        await availabilityController.search(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
     return router;
   }
 
   createBookingRoutes(bookingController: BookingController): Router {
     const router = Router();
-    router.post('/', (req, res) => bookingController.create(req, res));
-    router.delete('/:id', (req, res) => bookingController.cancel(req, res));
+    
+    router.post('/', async (req, res, next) => {
+      try {
+        await bookingController.create(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    router.delete('/:id', async (req, res, next) => {
+      try {
+        await bookingController.cancel(req, res);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
     return router;
   }
 } 

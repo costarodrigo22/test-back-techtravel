@@ -3,13 +3,19 @@ import { User, UserGender } from '../../entities/User';
 import { IUsersRepository } from '../../interfaces/repositories/IUsersRepository';
 import { IAuthService } from '../../interfaces/services/IAuthService';
 import { IRegisterUserUseCase } from '../../interfaces/useCases/auth/IRegisterUserUseCase';
+import { AppError } from '../../errors/AppError';
+import { z } from 'zod';
 
-export interface RegisterUserRequest {
-  name: string;
-  email: string;
-  password: string;
-  gender: string;
-}
+export const RegisterUserSchema = z.object({
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  email: z.string().email('Email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+  gender: z.nativeEnum(UserGender, {
+    errorMap: () => ({ message: `Gênero inválido. Valores válidos: ${Object.values(UserGender).join(', ')}` })
+  })
+});
+
+export type RegisterUserRequest = z.infer<typeof RegisterUserSchema>;
 
 export interface RegisterUserResponse {
   user: {
@@ -28,13 +34,17 @@ export class RegisterUser implements IRegisterUserUseCase {
   ) {}
 
   async execute(request: RegisterUserRequest): Promise<RegisterUserResponse> {
-    // Validar dados de entrada
-    this.validateRequest(request);
+    // Validação centralizada com zod
+    const parsed = RegisterUserSchema.safeParse(request);
+    if (!parsed.success) {
+      const message = parsed.error.errors.map(e => e.message).join('; ');
+      throw new AppError(message, 400);
+    }
 
     // Verificar se o usuário já existe
     const existingUser = await this.usersRepository.findByEmail(request.email);
     if (existingUser) {
-      throw new Error('Usuário já existe com este email');
+      throw new AppError('Usuário já existe com este email', 400);
     }
 
     // Hash da senha
@@ -63,28 +73,5 @@ export class RegisterUser implements IRegisterUserUseCase {
       accessToken,
       refreshToken,
     };
-  }
-
-  private validateRequest(request: RegisterUserRequest): void {
-    if (!request.name || request.name.trim().length < 2) {
-      throw new Error('Nome deve ter pelo menos 2 caracteres');
-    }
-
-    if (!request.email || !this.isValidEmail(request.email)) {
-      throw new Error('Email inválido');
-    }
-
-    if (!request.password || request.password.length < 6) {
-      throw new Error('Senha deve ter pelo menos 6 caracteres');
-    }
-
-    if (!request.gender || !Object.values(UserGender).includes(request.gender as UserGender)) {
-      throw new Error('Gênero inválido');
-    }
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
 } 

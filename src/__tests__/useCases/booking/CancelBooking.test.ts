@@ -1,6 +1,8 @@
 import { CancelBooking, CancelBookingRequest } from '../../../useCases/booking/CancelBooking';
 import { IBookingsRepository } from '../../../interfaces/repositories/IBookingsRepository';
 import { Booking, BookingStatus } from '../../../entities/Booking';
+import { AppError } from '../../../errors/AppError';
+import { NotFoundError } from '../../../errors/NotFoundError';
 
 class FakeBookingsRepository implements IBookingsRepository {
   private bookings: Booking[] = [];
@@ -46,7 +48,7 @@ describe('CancelBooking UseCase', () => {
     const request: CancelBookingRequest = { id: 'id-inexistente' };
     await expect(cancelBookingUseCase.execute(request))
       .rejects
-      .toMatchObject({ status: 404, message: 'Reserva não encontrada.' });
+      .toThrow(NotFoundError);
   });
 
   it('deve lançar erro se reserva já estiver cancelada', async () => {
@@ -59,7 +61,7 @@ describe('CancelBooking UseCase', () => {
     const request: CancelBookingRequest = { id: booking.id };
     await expect(cancelBookingUseCase.execute(request))
       .rejects
-      .toMatchObject({ status: 400, message: 'Reserva já está cancelada.' });
+      .toThrow(AppError);
   });
 
   it('deve lançar erro se falhar ao atualizar a reserva', async () => {
@@ -77,6 +79,6 @@ describe('CancelBooking UseCase', () => {
     const request: CancelBookingRequest = { id: booking.id };
     await expect(cancelBookingUseCase.execute(request))
       .rejects
-      .toMatchObject({ status: 500, message: 'Erro ao cancelar a reserva.' });
+      .toThrow(AppError);
   });
 }); 

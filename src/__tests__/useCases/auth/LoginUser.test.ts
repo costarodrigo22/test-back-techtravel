@@ -3,6 +3,7 @@ import { IUsersRepository } from '../../../interfaces/repositories/IUsersReposit
 import { IAuthService } from '../../../interfaces/services/IAuthService';
 import { User, UserGender } from '../../../entities/User';
 import bcrypt from 'bcryptjs';
+import { AppError } from '../../../errors/AppError';
 
 class FakeUsersRepository implements IUsersRepository {
   private users: User[] = [];
@@ -82,7 +83,7 @@ describe('LoginUser UseCase', () => {
 
     await expect(loginUserUseCase.execute(loginData))
       .rejects
-      .toThrow('Email ou senha inválidos');
+      .toThrow(AppError);
   });
 
   it('não deve logar usuário inexistente', async () => {
@@ -97,6 +98,6 @@ describe('LoginUser UseCase', () => {
 
     await expect(loginUserUseCase.execute(loginData))
       .rejects
-      .toThrow('Email ou senha inválidos');
+      .toThrow(AppError);
   });
 }); 

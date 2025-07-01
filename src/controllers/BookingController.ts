@@ -11,52 +11,23 @@ export class BookingController {
   ) {}
 
   async create(req: Request, res: Response) {
-    try {
-      const { user_id, itinerary_id } = req.body;
+    const { user_id, itinerary_id } = req.body;
 
-      if (!user_id || !itinerary_id) {
-        return res.status(400).json({ error: 'user_id e itinerary_id são obrigatórios.' });
-      }
-
-      const booking = await this.createBooking.execute({ user_id, itinerary_id });
-      return res.status(201).json(booking);
-    } catch (error: any) {
-      if (error.status && error.message) {
-        return res.status(error.status).json({ error: error.message });
-      }
-      return res.status(500).json({ error: 'Erro ao criar reserva.' });
-    }
+    const booking = await this.createBooking.execute({ userId: user_id, itineraryId: itinerary_id });
+    return res.status(201).json(booking);
   }
 
   async listUserBookings(req: Request, res: Response) {
-    try {
-      const { userId } = req.params;
+    const { userId } = req.params;
 
-      const bookings = await this.getUserBookings.execute({ userId });
-      return res.json(bookings);
-    } catch (error: any) {
-      if (error.status && error.message) {
-        return res.status(error.status).json({ error: error.message });
-      }
-      return res.status(500).json({ error: 'Erro ao buscar reservas do usuário.' });
-    }
+    const bookings = await this.getUserBookings.execute({ userId });
+    return res.json(bookings);
   }
 
   async cancel(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
+    const { id } = req.params;
 
-      if (!id) {
-        return res.status(400).json({ error: 'ID da reserva é obrigatório.' });
-      }
-
-      const booking = await this.cancelBooking.execute({ id });
-      return res.json(booking);
-    } catch (error: any) {
-      if (error.status && error.message) {
-        return res.status(error.status).json({ error: error.message });
-      }
-      return res.status(500).json({ error: 'Erro ao cancelar reserva.' });
-    }
+    const booking = await this.cancelBooking.execute({ bookingId: id });
+    return res.json(booking);
   }
 } 

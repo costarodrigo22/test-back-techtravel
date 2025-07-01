@@ -10,8 +10,6 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
     });
   }
 
-  // Erros não tratados
-  console.error(err);
   return res.status(500).json({
     status: 'error',
     message: 'Erro interno do servidor',

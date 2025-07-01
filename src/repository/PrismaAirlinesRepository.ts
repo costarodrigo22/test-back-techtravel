@@ -1,19 +1,27 @@
 import { PrismaClient } from '../generated/prisma';
 import { Airline } from '../entities/Airline';
 import { IAirlinesRepository } from '../interfaces/repositories/IAirlinesRepository';
+import { AppError } from '../errors/AppError';
 
 export class PrismaAirlinesRepository implements IAirlinesRepository {
   private prisma = new PrismaClient();
 
   async create(airline: Airline): Promise<Airline> {
-    const created = await this.prisma.airline.create({
-      data: {
-        id: airline.id,
-        name: airline.name,
-        iata_code: airline.iata_code,
-      },
-    });
-    return this.mapPrismaToAirline(created);
+    try {
+      const created = await this.prisma.airline.create({
+        data: {
+          id: airline.id,
+          name: airline.name,
+          iata_code: airline.iata_code,
+        },
+      });
+      return this.mapPrismaToAirline(created);
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw new AppError('Já existe uma companhia aérea com esse código IATA.', 409);
+      }
+      throw new AppError('Erro ao criar companhia aérea.', 500);
+    }
   }
 
   async findById(id: string): Promise<Airline | null> {

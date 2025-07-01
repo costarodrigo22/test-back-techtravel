@@ -3,6 +3,7 @@ import { IBookingsRepository } from '../../../interfaces/repositories/IBookingsR
 import { IUsersRepository } from '../../../interfaces/repositories/IUsersRepository';
 import { Booking, BookingStatus } from '../../../entities/Booking';
 import { User, UserGender } from '../../../entities/User';
+import { NotFoundError } from '../../../errors/NotFoundError';
 
 describe('GetUserBookings UseCase', () => {
   class FakeBookingsRepository implements IBookingsRepository {
@@ -51,6 +52,6 @@ describe('GetUserBookings UseCase', () => {
     const request: GetUserBookingsRequest = { userId: 'id-inexistente' };
     await expect(getUserBookingsUseCase.execute(request))
       .rejects
-      .toMatchObject({ status: 404, message: 'Usuário não encontrado.' });
+      .toThrow(NotFoundError);
   });
 }); 

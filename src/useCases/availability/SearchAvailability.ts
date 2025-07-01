@@ -1,14 +1,18 @@
 import { IItinerariesRepository } from '../../interfaces/repositories/IItinerariesRepository';
 import { Itinerary } from '../../entities/Itinerary';
+import { AppError } from '../../errors/AppError';
+import { z } from 'zod';
 
-export interface SearchAvailabilityRequest {
-  origin: string;
-  destination: string;
-  departure_date: string;
-  return_date?: string;
-  airlines?: string[];
-  max_stops?: number;
-}
+export const SearchAvailabilitySchema = z.object({
+  origin: z.string().min(1, 'Origem é obrigatória'),
+  destination: z.string().min(1, 'Destino é obrigatório'),
+  departure_date: z.string().min(1, 'Data de partida é obrigatória'),
+  return_date: z.string().optional(),
+  airlines: z.array(z.string()).optional(),
+  max_stops: z.number().int().nonnegative().optional(),
+});
+
+export type SearchAvailabilityRequest = z.infer<typeof SearchAvailabilitySchema>;
 
 export interface SearchAvailabilityResponse {
   outbound_itineraries: Itinerary[];
@@ -23,10 +27,14 @@ export class SearchAvailability {
   ) {}
 
   async execute(request: SearchAvailabilityRequest): Promise<SearchAvailabilityResponse> {
-    const { origin, destination, departure_date, return_date, airlines, max_stops } = request;
-    if (!origin || !destination || !departure_date) {
-      throw { status: 400, message: 'origin, destination e departure_date são obrigatórios.' };
+    // Validação centralizada com zod
+    const parsed = SearchAvailabilitySchema.safeParse(request);
+    if (!parsed.success) {
+      const message = parsed.error.errors.map(e => e.message).join('; ');
+      throw new AppError(message, 400);
     }
+
+    const { origin, destination, departure_date, return_date, airlines, max_stops } = request;
 
     // Buscar todos os itinerários existentes
     const allItineraries = await this.itinerariesRepository.findAll();

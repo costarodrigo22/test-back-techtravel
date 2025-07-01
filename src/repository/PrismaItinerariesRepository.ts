@@ -1,6 +1,8 @@
 import { PrismaClient } from '../generated/prisma';
 import { Itinerary, ItineraryFlight } from '../entities/Itinerary';
 import { IItinerariesRepository } from '../interfaces/repositories/IItinerariesRepository';
+import { AppError } from '../errors/AppError';
+import { NotFoundError } from '../errors/NotFoundError';
 
 export class PrismaItinerariesRepository implements IItinerariesRepository {
   private prisma = new PrismaClient();
@@ -130,7 +132,7 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
       airline_iata_code: f.flight.airline?.iata_code
     }));
     if (flightsData.length === 0) {
-      return new Itinerary(it.id, '', '', new Date(), new Date(), 0, 0, []);
+      throw new NotFoundError('Itinerário não possui voos associados.');
     }
     const origin_iata = flightsData[0].origin_iata;
     const destination_iata = flightsData[flightsData.length - 1].destination_iata;
@@ -153,9 +155,22 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
   }
 
   async delete(id: string): Promise<void> {
-    // Remove as relações ItineraryFlight primeiro
-    await this.prisma.itineraryFlight.deleteMany({ where: { itineraryId: id } });
-    // Remove o itinerário
-    await this.prisma.itinerary.delete({ where: { id } });
+    try {
+      // Remove as relações ItineraryFlight primeiro
+      await this.prisma.itineraryFlight.deleteMany({ where: { itineraryId: id } });
+      // Remove o itinerário
+      const deleted = await this.prisma.itinerary.delete({ where: { id } });
+      if (!deleted) {
+        throw new NotFoundError('Itinerário não encontrado.');
+      }
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        throw new NotFoundError('Itinerário não encontrado.');
+      }
+      if (error.code === 'P2003') {
+        throw new AppError('Não é possível deletar o itinerário pois ele está vinculado a uma reserva.', 409);
+      }
+      throw new AppError('Erro ao deletar itinerário.', 500);
+    }
   }
 } 

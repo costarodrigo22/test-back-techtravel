@@ -2,11 +2,15 @@ import bcrypt from 'bcryptjs';
 import { IUsersRepository } from '../../interfaces/repositories/IUsersRepository';
 import { IAuthService } from '../../interfaces/services/IAuthService';
 import { ILoginUserUseCase } from '../../interfaces/useCases/auth/ILoginUserUseCase';
+import { AppError } from '../../errors/AppError';
+import { z } from 'zod';
 
-export interface LoginUserRequest {
-  email: string;
-  password: string;
-}
+export const LoginUserSchema = z.object({
+  email: z.string().email('Email inválido'),
+  password: z.string().min(1, 'Senha é obrigatória'),
+});
+
+export type LoginUserRequest = z.infer<typeof LoginUserSchema>;
 
 export interface LoginUserResponse {
   user: {
@@ -25,19 +29,23 @@ export class LoginUser implements ILoginUserUseCase {
   ) {}
 
   async execute(request: LoginUserRequest): Promise<LoginUserResponse> {
-    // Validar dados de entrada
-    this.validateRequest(request);
+    // Validação centralizada com zod
+    const parsed = LoginUserSchema.safeParse(request);
+    if (!parsed.success) {
+      const message = parsed.error.errors.map(e => e.message).join('; ');
+      throw new AppError(message, 400);
+    }
 
     // Buscar usuário
     const user = await this.usersRepository.findByEmail(request.email);
     if (!user) {
-      throw new Error('Email ou senha inválidos');
+      throw new AppError('Email ou senha inválidos', 401);
     }
 
     // Verificar senha
     const isPasswordValid = await bcrypt.compare(request.password, user.password);
     if (!isPasswordValid) {
-      throw new Error('Email ou senha inválidos');
+      throw new AppError('Email ou senha inválidos', 401);
     }
 
     // Gerar tokens
@@ -53,20 +61,5 @@ export class LoginUser implements ILoginUserUseCase {
       accessToken,
       refreshToken,
     };
-  }
-
-  private validateRequest(request: LoginUserRequest): void {
-    if (!request.email || !this.isValidEmail(request.email)) {
-      throw new Error('Email inválido');
-    }
-
-    if (!request.password || request.password.length < 1) {
-      throw new Error('Senha é obrigatória');
-    }
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
 } 

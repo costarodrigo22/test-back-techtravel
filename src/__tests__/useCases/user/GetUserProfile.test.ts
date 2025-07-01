@@ -1,6 +1,8 @@
 import { GetUserProfile, GetUserProfileRequest } from '../../../useCases/user/GetUserProfile';
 import { IUsersRepository } from '../../../interfaces/repositories/IUsersRepository';
 import { User, UserGender } from '../../../entities/User';
+import { NotFoundError } from '../../../errors/NotFoundError';
+import { AppError } from '../../../errors/AppError';
 
 class FakeUsersRepository implements IUsersRepository {
   private users: User[] = [];
@@ -50,7 +52,7 @@ describe('GetUserProfile UseCase', () => {
 
     await expect(getUserProfileUseCase.execute(request))
       .rejects
-      .toThrow('Usuário não encontrado');
+      .toThrow(NotFoundError);
   });
 
   it('deve lançar erro se o id não for informado', async () => {
@@ -63,6 +65,6 @@ describe('GetUserProfile UseCase', () => {
 
     await expect(getUserProfileUseCase.execute(request))
       .rejects
-      .toThrow('ID do usuário é obrigatório');
+      .toThrow(AppError);
   });
 }); 

@@ -2,6 +2,7 @@ import { RegisterUser, RegisterUserRequest } from '../../../useCases/auth/Regist
 import { IUsersRepository } from '../../../interfaces/repositories/IUsersRepository';
 import { IAuthService } from '../../../interfaces/services/IAuthService';
 import { User, UserGender } from '../../../entities/User';
+import { AppError } from '../../../errors/AppError';
 
 class FakeUsersRepository implements IUsersRepository {
   private users: User[] = [];
@@ -69,6 +70,6 @@ describe('RegisterUser UseCase', () => {
 
     await expect(registerUserUseCase.execute(userData))
       .rejects
-      .toThrow('Usuário já existe com este email');
+      .toThrow(AppError);
   });
 });

@@ -2,11 +2,16 @@ import { Booking } from '../../entities/Booking';
 import { IBookingsRepository } from '../../interfaces/repositories/IBookingsRepository';
 import { IUsersRepository } from '../../interfaces/repositories/IUsersRepository';
 import { IItinerariesRepository } from '../../interfaces/repositories/IItinerariesRepository';
+import { NotFoundError } from '../../errors/NotFoundError';
+import { AppError } from '../../errors/AppError';
+import { z } from 'zod';
 
-export interface CreateBookingRequest {
-  user_id: string;
-  itinerary_id: string;
-}
+export const CreateBookingSchema = z.object({
+  userId: z.string().min(1, 'ID do usuário é obrigatório'),
+  itineraryId: z.string().min(1, 'ID do itinerário é obrigatório'),
+});
+
+export type CreateBookingRequest = z.infer<typeof CreateBookingSchema>;
 
 export class CreateBooking {
   constructor(
@@ -16,22 +21,29 @@ export class CreateBooking {
   ) {}
 
   async execute(request: CreateBookingRequest): Promise<Booking> {
-    const { user_id, itinerary_id } = request;
+    // Validação centralizada com zod
+    const parsed = CreateBookingSchema.safeParse(request);
+    if (!parsed.success) {
+      const message = parsed.error.errors.map(e => e.message).join('; ');
+      throw new AppError(message, 400);
+    }
+
+    const { userId, itineraryId } = request;
 
     // Validar se o usuário existe
-    const user = await this.usersRepository.findById(user_id);
+    const user = await this.usersRepository.findById(userId);
     if (!user) {
-      throw { status: 404, message: 'Usuário não encontrado.' };
+      throw new NotFoundError('Usuário não encontrado.');
     }
 
     // Validar se o itinerário existe
-    const itinerary = await this.itinerariesRepository.findById(itinerary_id);
+    const itinerary = await this.itinerariesRepository.findById(itineraryId);
     if (!itinerary) {
-      throw { status: 404, message: 'Itinerário não encontrado.' };
+      throw new NotFoundError('Itinerário não encontrado.');
     }
 
     // Criar a reserva
-    const booking = new Booking(user_id, itinerary_id);
+    const booking = new Booking(userId, itineraryId);
     return this.bookingsRepository.create(booking);
   }
 } 

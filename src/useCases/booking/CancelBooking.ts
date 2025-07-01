@@ -1,36 +1,38 @@
 import { Booking, BookingStatus } from '../../entities/Booking';
 import { IBookingsRepository } from '../../interfaces/repositories/IBookingsRepository';
+import { NotFoundError } from '../../errors/NotFoundError';
+import { AppError } from '../../errors/AppError';
+import { z } from 'zod';
 
-export interface CancelBookingRequest {
-  id: string;
-}
+export const CancelBookingSchema = z.object({
+  bookingId: z.string().min(1, 'ID da reserva é obrigatório'),
+});
+
+export type CancelBookingRequest = z.infer<typeof CancelBookingSchema>;
 
 export class CancelBooking {
   constructor(private bookingsRepository: IBookingsRepository) {}
 
   async execute(request: CancelBookingRequest): Promise<Booking> {
-    const { id } = request;
+    // Validação centralizada com zod
+    const parsed = CancelBookingSchema.safeParse(request);
+    if (!parsed.success) {
+      const message = parsed.error.errors.map(e => e.message).join('; ');
+      throw new AppError(message, 400);
+    }
 
-    // Buscar a reserva
-    const booking = await this.bookingsRepository.findById(id);
+    const { bookingId } = request;
+
+    const booking = await this.bookingsRepository.findById(bookingId);
     if (!booking) {
-      throw { status: 404, message: 'Reserva não encontrada.' };
+      throw new NotFoundError('Reserva não encontrada.');
     }
 
-    // Verificar se já não está cancelada
     if (booking.status === BookingStatus.CANCELLED) {
-      throw { status: 400, message: 'Reserva já está cancelada.' };
+      throw new AppError('Reserva já está cancelada.', 409);
     }
 
-    // Atualizar o status para CANCELLED
-    const updatedBooking = await this.bookingsRepository.update(id, {
-      status: BookingStatus.CANCELLED
-    });
-
-    if (!updatedBooking) {
-      throw { status: 500, message: 'Erro ao cancelar a reserva.' };
-    }
-
-    return updatedBooking;
+    booking.status = BookingStatus.CANCELLED;
+    return this.bookingsRepository.update(bookingId, { status: BookingStatus.CANCELLED }) as Promise<Booking>;
   }
 } 

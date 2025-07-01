@@ -5,38 +5,39 @@ import { IItinerariesRepository } from '../../../interfaces/repositories/IItiner
 import { Booking, BookingStatus } from '../../../entities/Booking';
 import { User, UserGender } from '../../../entities/User';
 import { Itinerary } from '../../../entities/Itinerary';
-
-class FakeBookingsRepository implements IBookingsRepository {
-  private bookings: Booking[] = [];
-
-  async create(booking: Booking): Promise<Booking> {
-    this.bookings.push(booking);
-    return booking;
-  }
-  async findById(id: string): Promise<Booking | null> { return this.bookings.find(b => b.id === id) || null; }
-  async findByUserId(userId: string): Promise<Booking[]> { return this.bookings.filter(b => b.user_id === userId); }
-  async findByItineraryId(itineraryId: string): Promise<Booking[]> { return this.bookings.filter(b => b.itinerary_id === itineraryId); }
-  async update(id: string, booking: Partial<Booking>): Promise<Booking | null> { return null; }
-  async delete(id: string): Promise<void> { }
-  async findAll(): Promise<Booking[]> { return this.bookings; }
-}
-
-class FakeUsersRepository implements IUsersRepository {
-  private users: User[] = [];
-  async create(user: User): Promise<void> { this.users.push(user); }
-  async findById(id: string): Promise<User | null> { return this.users.find(u => u.id === id) || null; }
-  async findByEmail(email: string): Promise<User | null> { return this.users.find(u => u.email === email) || null; }
-}
-
-class FakeItinerariesRepository implements IItinerariesRepository {
-  private itineraries: Itinerary[] = [];
-  async findAll(): Promise<Itinerary[]> { return this.itineraries; }
-  async findById(id: string): Promise<Itinerary | null> { return this.itineraries.find(i => i.id === id) || null; }
-  async create(flightIds: string[]): Promise<Itinerary> { throw new Error('not implemented'); }
-  async delete(id: string): Promise<void> { }
-}
+import { NotFoundError } from '../../../errors/NotFoundError';
 
 describe('CreateBooking UseCase', () => {
+  class FakeBookingsRepository implements IBookingsRepository {
+    private bookings: Booking[] = [];
+
+    async create(booking: Booking): Promise<Booking> {
+      this.bookings.push(booking);
+      return booking;
+    }
+    async findById(id: string): Promise<Booking | null> { return this.bookings.find(b => b.id === id) || null; }
+    async findByUserId(userId: string): Promise<Booking[]> { return this.bookings.filter(b => b.user_id === userId); }
+    async findByItineraryId(itineraryId: string): Promise<Booking[]> { return this.bookings.filter(b => b.itinerary_id === itineraryId); }
+    async update(id: string, booking: Partial<Booking>): Promise<Booking | null> { return null; }
+    async delete(id: string): Promise<void> { }
+    async findAll(): Promise<Booking[]> { return this.bookings; }
+  }
+
+  class FakeUsersRepository implements IUsersRepository {
+    private users: User[] = [];
+    async create(user: User): Promise<void> { this.users.push(user); }
+    async findById(id: string): Promise<User | null> { return this.users.find(u => u.id === id) || null; }
+    async findByEmail(email: string): Promise<User | null> { return this.users.find(u => u.email === email) || null; }
+  }
+
+  class FakeItinerariesRepository implements IItinerariesRepository {
+    private itineraries: Itinerary[] = [];
+    async findAll(): Promise<Itinerary[]> { return this.itineraries; }
+    async findById(id: string): Promise<Itinerary | null> { return this.itineraries.find(i => i.id === id) || null; }
+    async create(flightIds: string[]): Promise<Itinerary> { throw new Error('not implemented'); }
+    async delete(id: string): Promise<void> { }
+  }
+
   it('deve criar uma reserva se usuário e itinerário existirem', async () => {
     const fakeBookingsRepo = new FakeBookingsRepository();
     const fakeUsersRepo = new FakeUsersRepository();
@@ -76,7 +77,7 @@ describe('CreateBooking UseCase', () => {
 
     await expect(createBookingUseCase.execute(request))
       .rejects
-      .toMatchObject({ status: 404, message: 'Usuário não encontrado.' });
+      .toThrow(NotFoundError);
   });
 
   it('deve lançar erro se itinerário não existir', async () => {
@@ -95,6 +96,6 @@ describe('CreateBooking UseCase', () => {
 
     await expect(createBookingUseCase.execute(request))
       .rejects
-      .toMatchObject({ status: 404, message: 'Itinerário não encontrado.' });
+      .toThrow(NotFoundError);
   });
 }); 
