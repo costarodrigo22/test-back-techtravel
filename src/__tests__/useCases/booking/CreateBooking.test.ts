@@ -50,8 +50,8 @@ describe('CreateBooking UseCase', () => {
     fakeItinerariesRepo['itineraries'].push(itinerary);
 
     const request: CreateBookingRequest = {
-      user_id: user.id,
-      itinerary_id: itinerary.id,
+      userId: user.id,
+      itineraryId: itinerary.id,
     };
 
     const booking = await createBookingUseCase.execute(request);
@@ -71,8 +71,8 @@ describe('CreateBooking UseCase', () => {
     fakeItinerariesRepo['itineraries'].push(itinerary);
 
     const request: CreateBookingRequest = {
-      user_id: 'id-inexistente',
-      itinerary_id: itinerary.id,
+      userId: 'id-inexistente',
+      itineraryId: itinerary.id,
     };
 
     await expect(createBookingUseCase.execute(request))
@@ -90,8 +90,8 @@ describe('CreateBooking UseCase', () => {
     await fakeUsersRepo.create(user);
 
     const request: CreateBookingRequest = {
-      user_id: user.id,
-      itinerary_id: 'id-inexistente',
+      userId: user.id,
+      itineraryId: 'id-inexistente',
     };
 
     await expect(createBookingUseCase.execute(request))

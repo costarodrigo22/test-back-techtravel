@@ -34,7 +34,7 @@ describe('CancelBooking UseCase', () => {
     const booking = new Booking('user1', 'iti1', BookingStatus.CONFIRMED);
     await fakeBookingsRepo.create(booking);
 
-    const request: CancelBookingRequest = { id: booking.id };
+    const request: CancelBookingRequest = { bookingId: booking.id };
     const updatedBooking = await cancelBookingUseCase.execute(request);
 
     expect(updatedBooking.status).toBe(BookingStatus.CANCELLED);
@@ -45,7 +45,7 @@ describe('CancelBooking UseCase', () => {
     const fakeBookingsRepo = new FakeBookingsRepository();
     const cancelBookingUseCase = new CancelBooking(fakeBookingsRepo);
 
-    const request: CancelBookingRequest = { id: 'id-inexistente' };
+    const request: CancelBookingRequest = { bookingId: 'id-inexistente' };
     await expect(cancelBookingUseCase.execute(request))
       .rejects
       .toThrow(NotFoundError);
@@ -58,7 +58,7 @@ describe('CancelBooking UseCase', () => {
     const booking = new Booking('user1', 'iti1', BookingStatus.CANCELLED);
     await fakeBookingsRepo.create(booking);
 
-    const request: CancelBookingRequest = { id: booking.id };
+    const request: CancelBookingRequest = { bookingId: booking.id };
     await expect(cancelBookingUseCase.execute(request))
       .rejects
       .toThrow(AppError);
@@ -76,7 +76,7 @@ describe('CancelBooking UseCase', () => {
     const booking = new Booking('user1', 'iti1', BookingStatus.CONFIRMED);
     await fakeBookingsRepo.create(booking);
 
-    const request: CancelBookingRequest = { id: booking.id };
+    const request: CancelBookingRequest = { bookingId: booking.id };
     await expect(cancelBookingUseCase.execute(request))
       .rejects
       .toThrow(AppError);

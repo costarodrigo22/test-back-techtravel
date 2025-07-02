@@ -32,6 +32,10 @@ export class CancelBooking {
     }
 
     booking.status = BookingStatus.CANCELLED;
-    return this.bookingsRepository.update(bookingId, { status: BookingStatus.CANCELLED }) as Promise<Booking>;
+    const updated = await this.bookingsRepository.update(bookingId, { status: BookingStatus.CANCELLED });
+    if (!updated) {
+      throw new AppError('Falha ao cancelar a reserva.', 500);
+    }
+    return updated;
   }
 } 
