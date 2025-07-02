@@ -1,6 +1,34 @@
 import { Request, Response } from 'express';
 import { SearchAvailability } from '../useCases/availability/SearchAvailability';
 
+/**
+ * @openapi
+ * /availability/search:
+ *   post:
+ *     summary: Busca disponibilidade de itinerários
+ *     tags:
+ *       - Availability
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               origin_iata:
+ *                 type: string
+ *               destination_iata:
+ *                 type: string
+ *               departure_date:
+ *                 type: string
+ *                 format: date
+ *               return_date:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       200:
+ *         description: Itinerários disponíveis retornados com sucesso
+ */
 export class AvailabilityController {
   constructor(private searchAvailability: SearchAvailability) {}
 

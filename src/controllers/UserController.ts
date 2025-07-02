@@ -4,6 +4,21 @@ import { GetUserProfile } from '../useCases/user/GetUserProfile';
 import { IUserController } from '../interfaces/controllers/IUserController';
 import { AppError } from '../errors/AppError';
 
+/**
+ * @openapi
+ * /users/profile:
+ *   get:
+ *     summary: Obtém o perfil do usuário autenticado
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Perfil do usuário retornado com sucesso
+ *       401:
+ *         description: Não autenticado
+ */
 export class UserController implements IUserController {
   constructor(private getUserProfile: GetUserProfile) {}
 
@@ -18,4 +33,22 @@ export class UserController implements IUserController {
     
     res.status(200).json(result);
   }
-} 
+}
+
+/**
+ * @openapi
+ * /users/{userId}/bookings:
+ *   get:
+ *     summary: Lista todas as reservas de um usuário
+ *     tags:
+ *       - Booking
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de reservas do usuário
+ */ 

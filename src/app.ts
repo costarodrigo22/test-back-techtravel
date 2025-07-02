@@ -15,19 +15,19 @@ import { AvailabilityController } from './controllers/AvailabilityController';
 import { BookingController } from './controllers/BookingController';
 import { errorHandler } from './middleware/errorHandler';
 
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './swagger';
+
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Dependency Injection Container
 const container = new Container();
 
-// Resolve dependencies
 const authController = container.resolve('IAuthController') as IAuthController;
 const userController = container.resolve('IUserController') as IUserController;
 const routeFactory = container.resolve('IRouteFactory') as IRouteFactory;
@@ -39,7 +39,6 @@ const itineraryController = container.resolve('ItineraryController') as Itinerar
 const availabilityController = container.resolve('AvailabilityController') as AvailabilityController;
 const bookingController = container.resolve('BookingController') as BookingController;
 
-// Routes
 app.use('/auth', routeFactory.createAuthRoutes(authController));
 app.use('/flights', authMiddleware(authService), routeFactory.createFlightRoutes(flightController));
 app.use('/airlines', authMiddleware(authService), routeFactory.createAirlineRoutes(airlineController));
@@ -49,12 +48,33 @@ app.use('/availability', authMiddleware(authService), routeFactory.createAvailab
 app.use('/bookings', authMiddleware(authService), routeFactory.createBookingRoutes(bookingController));
 app.use('/users', authMiddleware(authService), routeFactory.createUserRoutes(userController));
 
-// Health check
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+/**
+ * @openapi
+ * /health:
+ *   get:
+ *     summary: Health check da API
+ *     tags:
+ *       - Health
+ *     responses:
+ *       200:
+ *         description: API está saudável
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ */
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Middleware global de erros (deve ser o último)
 app.use(errorHandler);
 
 app.listen(port, () => {
