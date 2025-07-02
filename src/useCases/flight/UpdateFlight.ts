@@ -27,7 +27,6 @@ export class UpdateFlight {
   constructor(private flightsRepository: IFlightsRepository) {}
 
   async execute(request: UpdateFlightRequest): Promise<Flight> {
-    // Validação centralizada com zod
     const parsed = UpdateFlightSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -36,7 +35,6 @@ export class UpdateFlight {
 
     const { id, data } = request;
 
-    // Verificar se o voo existe
     const existingFlight = await this.flightsRepository.findById(id);
     if (!existingFlight) {
       throw new NotFoundError('Voo não encontrado.');

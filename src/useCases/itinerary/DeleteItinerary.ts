@@ -13,7 +13,6 @@ export class DeleteItinerary {
   constructor(private itinerariesRepository: IItinerariesRepository) {}
 
   async execute(request: DeleteItineraryRequest): Promise<void> {
-    // Validação centralizada com zod
     const parsed = DeleteItinerarySchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -22,7 +21,6 @@ export class DeleteItinerary {
 
     const { id } = request;
 
-    // Verificar se o itinerário existe
     const existingItinerary = await this.itinerariesRepository.findById(id);
     if (!existingItinerary) {
       throw new NotFoundError('Itinerário não encontrado.');

@@ -34,7 +34,6 @@ export class AvailabilityController {
 
   async search(req: Request, res: Response) {
     const result = await this.searchAvailability.execute(req.body);
-    // Mapeia os itinerários para garantir o campo itinerary_id
     const mapItinerary = (it: any) => ({
       itinerary_id: it.id,
       origin_iata: it.origin_iata,

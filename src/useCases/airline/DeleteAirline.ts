@@ -13,7 +13,6 @@ export class DeleteAirline {
   constructor(private airlinesRepository: IAirlinesRepository) {}
 
   async execute(request: DeleteAirlineRequest): Promise<void> {
-    // Validação centralizada com zod
     const parsed = DeleteAirlineSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -22,7 +21,6 @@ export class DeleteAirline {
 
     const { id } = request;
 
-    // Verificar se a companhia aérea existe
     const existingAirline = await this.airlinesRepository.findById(id);
     if (!existingAirline) {
       throw new NotFoundError('Companhia aérea não encontrada.');

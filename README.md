@@ -161,283 +161,91 @@ src/
 - **GetUserBookings** - Listar reservas do usuário
 - **CancelBooking** - Cancelar reserva
 
-## 🛠️ Instalação e Configuração
-
-### 1. Clone o repositório
-```bash
-git clone <repository-url>
-cd test-back-techtravel
-```
-
-### 2. Instale as dependências
-```bash
-npm install
-```
-
-### 3. Configure as variáveis de ambiente
-Crie um arquivo `.env` baseado no `.env.example`:
-```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/travel_management"
-JWT_SECRET="seu_jwt_secret_aqui"
-JWT_REFRESH_SECRET="seu_jwt_refresh_secret_aqui"
-PORT=3000
-```
-
-### 4. Inicie o banco de dados com Docker
-```bash
-docker-compose up -d
-```
-
-### 5. Execute as migrações do Prisma
-```bash
-npm run prisma:migrate
-```
-
-### 6. Gere o cliente Prisma
-```bash
-npm run prisma:generate
-```
-
-### 7. Inicie a aplicação
-```bash
-# Desenvolvimento
-npm run dev
-
-# Produção
-npm run build
-npm start
-```
-
-## 📚 APIs
-
-### **Autenticação**
-
-#### POST /auth/register
-Cadastrar novo usuário.
-
-**Body:**
-```json
-{
-  "name": "João Silva",
-  "email": "joao@empresa.com",
-  "password": "senha123",
-  "gender": "MALE"
-}
-```
-
-#### POST /auth/login
-Fazer login.
-
-**Body:**
-```json
-{
-  "email": "joao@empresa.com",
-  "password": "senha123"
-}
-```
-
-#### POST /auth/refresh
-Renovar access token.
-
-**Body:**
-```json
-{
-  "refreshToken": "refresh_token"
-}
-```
-
-### **Usuários (Rotas Privadas)**
-
-#### GET /users/profile
-Obter perfil do usuário autenticado.
-
-#### GET /users/:userId/bookings
-Listar reservas de um usuário.
-
-### **Companhias Aéreas (Rotas Privadas)**
-
-#### GET /airlines
-Listar companhias aéreas.
-
-#### GET /airlines/:id
-Buscar companhia por ID.
-
-#### POST /airlines
-Criar companhia aérea.
-
-#### PUT /airlines/:id
-Atualizar companhia.
-
-#### DELETE /airlines/:id
-Deletar companhia.
-
-### **Aeroportos (Rotas Privadas)**
-
-#### GET /airports
-Listar aeroportos.
-
-#### GET /airports/:id
-Buscar aeroporto por ID.
-
-#### POST /airports
-Criar aeroporto.
-
-#### PUT /airports/:id
-Atualizar aeroporto.
-
-#### DELETE /airports/:id
-Deletar aeroporto.
-
-### **Voos (Rotas Privadas)**
-
-#### GET /flights
-Listar voos.
-
-#### GET /flights/:id
-Buscar voo por ID.
-
-#### POST /flights
-Criar voo.
-
-#### PUT /flights/:id
-Atualizar voo.
-
-#### DELETE /flights/:id
-Deletar voo.
-
-### **Itinerários (Rotas Privadas)**
-
-#### GET /itineraries
-Listar itinerários.
-
-#### GET /itineraries/:id
-Buscar itinerário por ID.
-
-#### POST /itineraries
-Criar itinerário.
-
-#### DELETE /itineraries/:id
-Deletar itinerário.
-
-### **Disponibilidade (Rotas Privadas)**
-
-#### POST /availability/search
-Buscar disponibilidade de voos.
-
-**Body:**
-```json
-{
-  "origin": "GRU",
-  "destination": "JFK",
-  "departure_date": "2024-02-15",
-  "return_date": "2024-02-20",
-  "airlines": ["LA", "AA"],
-  "max_stops": 1
-}
-```
-
-### **Reservas (Rotas Privadas)**
-
-#### POST /bookings
-Criar reserva.
-
-**Body:**
-```json
-{
-  "user_id": "user-uuid",
-  "itinerary_id": "itinerary-uuid"
-}
-```
-
-#### GET /users/:userId/bookings
-Listar reservas de um usuário.
-
-#### DELETE /bookings/:id
-Cancelar reserva.
-
-### **Health Check**
-
-#### GET /health
-Verificar status da aplicação.
-
-## 🔐 Autenticação
-
-O sistema usa JWT (JSON Web Tokens) para autenticação:
-
-- **Access Token**: Expira em 15 minutos
-- **Refresh Token**: Expira em 7 dias
-- **Header**: `Authorization: Bearer <token>`
-
-## 🗄️ Banco de Dados
-
-### **Entidades Principais:**
-- **User**: Usuários do sistema
-- **Airline**: Companhias aéreas
-- **Airport**: Aeroportos
-- **Flight**: Voos
-- **Itinerary**: Itinerários (composição de voos)
-- **Booking**: Reservas de usuários
-
-### **Relacionamentos:**
-- User → Booking (1:N)
-- Airline → Flight (1:N)
-- Airport → Flight (origem/destino) (1:N)
-- Flight → Itinerary (N:M)
-- Itinerary → Booking (1:N)
-
-## 🔧 Scripts Disponíveis
-
-- `npm run dev` - Iniciar em modo desenvolvimento
-- `npm run build` - Compilar TypeScript
-- `npm start` - Iniciar em produção
-- `npm run prisma:generate` - Gerar cliente Prisma
-- `npm run prisma:migrate` - Executar migrações
-- `npm run prisma:studio` - Abrir Prisma Studio
-
-## 🚨 Segurança
-
-- Senhas são hasheadas com bcrypt
-- JWT tokens com expiração
-- Refresh tokens para renovação segura
-- Validação de entrada em todos os casos de uso
-- CORS configurado
-- Middleware de autenticação em rotas privadas
-
-## 🎯 Vantagens da Arquitetura
-
-### **1. Flexibilidade**
-- Fácil troca de implementações
-- Configuração por ambiente
-- Plugins e extensões
-
-### **2. Testabilidade**
-- Mocks simples de criar
-- Testes isolados
-- Cobertura completa
-
-### **3. Manutenibilidade**
-- Código organizado
-- Responsabilidades claras
-- Fácil de entender
-
-### **4. Escalabilidade**
-- Novos módulos fáceis de adicionar
-- Dependências gerenciadas
-- Arquitetura consistente
-
-## 📝 Próximos Passos
-
-1. **Implementar validação** com decorators
-2. **Adicionar logs** estruturados
-3. **Implementar cache** com interfaces
-4. **Criar testes** unitários completos
-5. **Adicionar métricas** e monitoramento
-6. **Implementar rate limiting** com interfaces
-7. **Adicionar documentação** com Swagger/OpenAPI
-8. **Implementar notificações** por email
+---
+
+## ✅ Checklist pós-clone (para rodar o projeto do zero)
+
+1. **Clone o repositório**
+   ```bash
+   git clone https://github.com/costarodrigo22/test-back-techtravel.git
+   cd test-back-techtravel
+   ```
+2. **Instale as dependências**
+   ```bash
+   npm install
+   ```
+3. **Configure as variáveis de ambiente**
+   - Copie `.env.example` para `.env` e ajuste as variáveis:
+     ```env
+     DATABASE_URL="postgresql://postgres:postgres@localhost:5432/travel_management"
+     JWT_SECRET="seu_jwt_secret_aqui"
+     JWT_REFRESH_SECRET="seu_jwt_refresh_secret_aqui"
+     PORT=3000
+     ```
+4. **Inicie o banco de dados com Docker**
+   ```bash
+   docker-compose up -d
+   ```
+5. **Execute as migrações do Prisma**
+   ```bash
+   npm run prisma:migrate
+   ```
+6. **Gere o cliente Prisma e arquivos necessários**
+   ```bash
+   npm run prisma:generate
+   ```
+7. **Inicie a aplicação**
+   ```bash
+   npm run dev
+   # ou para produção
+   npm run build && npm start
+   ```
+
+---
+
+## 🗂️ Observações sobre a pasta `generated`
+
+- Arquivos em `src/generated` são criados automaticamente por ferramentas (ex: Prisma).
+- Não são versionados no Git (estão no `.gitignore`).
+- Sempre rode os comandos de geração após clonar o projeto (`npm run prisma:generate`).
+
+---
+
+## 📖 Documentação Interativa (Swagger)
+
+- Acesse [http://localhost:3000/api-docs](http://localhost:3000/api-docs) após iniciar a API.
+- Todos os endpoints estão documentados.
+- Para endpoints protegidos, clique em **Authorize** e insira seu token JWT (obtido via `/auth/login`).
+- Exemplos de request/response disponíveis na interface.
+
+---
+
+## 🧪 Testes Automatizados
+
+- Testes unitários e de integração com **Jest**.
+- Cobertura para casos de uso, controllers, middlewares e integrações principais.
+- Para rodar os testes:
+  ```bash
+  npm test
+  ```
+- Os testes garantem a robustez das regras de negócio e integração entre camadas.
+
+---
 
 ## 📚 Documentação Adicional
 
 - [Modelagem do Banco de Dados](./DATABASE_MODELING.md)
 - [Arquitetura de Casos de Uso](./USE_CASES_ARCHITECTURE.md)
-- [Clean Architecture com IoC e DI](./CLEAN_ARCHITECTURE.md) 
+- [Clean Architecture com IoC e DI](./CLEAN_ARCHITECTURE.md)
+
+---
+
+## 🤝 Contribuição e Contato
+
+Contribuições são bem-vindas! Abra issues ou pull requests.
+
+Dúvidas? Entre em contato pelo e-mail: [costarodrigosilva247@gmail.com]
+
+---
+
+© 2025 TechTravel API teste. 

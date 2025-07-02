@@ -13,7 +13,6 @@ export class DeleteAirport {
   constructor(private airportsRepository: IAirportsRepository) {}
 
   async execute(request: DeleteAirportRequest): Promise<void> {
-    // Validação centralizada com zod
     const parsed = DeleteAirportSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -22,7 +21,6 @@ export class DeleteAirport {
 
     const { id } = request;
 
-    // Verificar se o aeroporto existe
     const existingAirport = await this.airportsRepository.findById(id);
     if (!existingAirport) {
       throw new NotFoundError('Aeroporto não encontrado.');

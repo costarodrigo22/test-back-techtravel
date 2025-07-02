@@ -14,7 +14,6 @@ export class GetAirportById {
   constructor(private airportsRepository: IAirportsRepository) {}
 
   async execute(request: GetAirportByIdRequest): Promise<Airport> {
-    // Validação centralizada com zod
     const parsed = GetAirportByIdSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');

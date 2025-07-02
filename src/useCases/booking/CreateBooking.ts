@@ -21,7 +21,6 @@ export class CreateBooking {
   ) {}
 
   async execute(request: CreateBookingRequest): Promise<Booking> {
-    // Validação centralizada com zod
     const parsed = CreateBookingSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -30,19 +29,16 @@ export class CreateBooking {
 
     const { userId, itineraryId } = request;
 
-    // Validar se o usuário existe
     const user = await this.usersRepository.findById(userId);
     if (!user) {
       throw new NotFoundError('Usuário não encontrado.');
     }
 
-    // Validar se o itinerário existe
     const itinerary = await this.itinerariesRepository.findById(itineraryId);
     if (!itinerary) {
       throw new NotFoundError('Itinerário não encontrado.');
     }
 
-    // Criar a reserva
     const booking = new Booking(userId, itineraryId);
     return this.bookingsRepository.create(booking);
   }

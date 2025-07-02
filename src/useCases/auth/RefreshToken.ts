@@ -23,7 +23,6 @@ export class RefreshToken implements IRefreshTokenUseCase {
   ) {}
 
   async execute(request: RefreshTokenRequest): Promise<RefreshTokenResponse> {
-    // Validação centralizada com zod
     const parsed = RefreshTokenSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -31,16 +30,13 @@ export class RefreshToken implements IRefreshTokenUseCase {
     }
 
     try {
-      // Verificar e decodificar o refresh token
       const decoded = jwt.verify(request.refreshToken, process.env.JWT_REFRESH_SECRET!) as any;
       
-      // Buscar usuário
       const user = await this.usersRepository.findById(decoded.userId);
       if (!user) {
         throw new NotFoundError('Usuário não encontrado');
       }
 
-      // Gerar novo access token
       const newAccessToken = this.authService.generateAccessToken(user);
       
       return { accessToken: newAccessToken };

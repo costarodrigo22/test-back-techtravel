@@ -29,26 +29,22 @@ export class LoginUser implements ILoginUserUseCase {
   ) {}
 
   async execute(request: LoginUserRequest): Promise<LoginUserResponse> {
-    // Validação centralizada com zod
     const parsed = LoginUserSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
       throw new AppError(message, 400);
     }
 
-    // Buscar usuário
     const user = await this.usersRepository.findByEmail(request.email);
     if (!user) {
       throw new AppError('Email ou senha inválidos', 401);
     }
 
-    // Verificar senha
     const isPasswordValid = await bcrypt.compare(request.password, user.password);
     if (!isPasswordValid) {
       throw new AppError('Email ou senha inválidos', 401);
     }
 
-    // Gerar tokens
     const accessToken = this.authService.generateAccessToken(user);
     const refreshToken = this.authService.generateRefreshToken(user);
 

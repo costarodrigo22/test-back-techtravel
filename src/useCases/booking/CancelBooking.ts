@@ -14,7 +14,6 @@ export class CancelBooking {
   constructor(private bookingsRepository: IBookingsRepository) {}
 
   async execute(request: CancelBookingRequest): Promise<Booking> {
-    // Validação centralizada com zod
     const parsed = CancelBookingSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');

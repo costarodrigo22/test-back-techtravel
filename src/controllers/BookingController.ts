@@ -39,23 +39,23 @@ export class BookingController {
     return res.status(201).json(booking);
   }
 
-  /**
-   * @openapi
-   * /bookings/user/{userId}:
-   *   get:
-   *     summary: Lista todas as reservas de um usuário
-   *     tags:
-   *       - Booking
-   *     parameters:
-   *       - in: path
-   *         name: userId
-   *         required: true
-   *         schema:
-   *           type: string
-   *     responses:
-   *       200:
-   *         description: Lista de reservas do usuário
-   */
+/**
+ * @openapi
+ * /users/{userId}/bookings:
+ *   get:
+ *     summary: Lista todas as reservas de um usuário
+ *     tags:
+ *       - Booking
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de reservas do usuário
+ */ 
   async listUserBookings(req: Request, res: Response) {
     const { userId } = req.params;
 

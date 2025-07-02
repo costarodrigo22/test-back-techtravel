@@ -75,12 +75,10 @@ export class Container implements IContainer {
   }
 
   resolve<T>(token: string): T {
-    // Check if instance already exists
     if (this.instances.has(token)) {
       return this.instances.get(token);
     }
 
-    // Check if factory exists
     if (this.factories.has(token)) {
       const factory = this.factories.get(token)!;
       const instance = factory();
@@ -88,7 +86,6 @@ export class Container implements IContainer {
       return instance;
     }
 
-    // Check if service exists
     const implementation = this.services.get(token);
     if (!implementation) {
       throw new Error(`"${token}" is not registered.`);
@@ -104,7 +101,6 @@ export class Container implements IContainer {
   }
 
   private registerDefaultServices(): void {
-    // Register repositories
     this.register('IUsersRepository', PrismaUsersRepository);
     this.register('IFlightsRepository', PrismaFlightsRepository);
     this.register('IAirlinesRepository', PrismaAirlinesRepository);
@@ -112,13 +108,11 @@ export class Container implements IContainer {
     this.register('IItinerariesRepository', PrismaItinerariesRepository);
     this.register('IBookingsRepository', PrismaBookingsRepository);
 
-    // Register services
     this.registerFactory('IAuthService', () => {
       const usersRepository = this.resolve<IUsersRepository>('IUsersRepository');
       return new AuthService(usersRepository);
     });
 
-    // Register use cases
     this.registerFactory('IRegisterUserUseCase', () => {
       const usersRepository = this.resolve<IUsersRepository>('IUsersRepository');
       const authService = this.resolve<IAuthService>('IAuthService');
@@ -142,42 +136,35 @@ export class Container implements IContainer {
       return new GetUserProfile(usersRepository);
     });
 
-    // Register use cases - Flight
     this.registerFactory('CreateFlight', () => new CreateFlight(this.resolve('IFlightsRepository')));
     this.registerFactory('GetFlightById', () => new GetFlightById(this.resolve('IFlightsRepository')));
     this.registerFactory('UpdateFlight', () => new UpdateFlight(this.resolve('IFlightsRepository')));
     this.registerFactory('DeleteFlight', () => new DeleteFlight(this.resolve('IFlightsRepository')));
     this.registerFactory('ListFlights', () => new ListFlights(this.resolve('IFlightsRepository')));
 
-    // Register use cases - Airline
     this.registerFactory('CreateAirline', () => new CreateAirline(this.resolve('IAirlinesRepository')));
     this.registerFactory('GetAirlineById', () => new GetAirlineById(this.resolve('IAirlinesRepository')));
     this.registerFactory('UpdateAirline', () => new UpdateAirline(this.resolve('IAirlinesRepository')));
     this.registerFactory('DeleteAirline', () => new DeleteAirline(this.resolve('IAirlinesRepository')));
     this.registerFactory('ListAirlines', () => new ListAirlines(this.resolve('IAirlinesRepository')));
 
-    // Register use cases - Airport
     this.registerFactory('CreateAirport', () => new CreateAirport(this.resolve('IAirportsRepository')));
     this.registerFactory('GetAirportById', () => new GetAirportById(this.resolve('IAirportsRepository')));
     this.registerFactory('UpdateAirport', () => new UpdateAirport(this.resolve('IAirportsRepository')));
     this.registerFactory('DeleteAirport', () => new DeleteAirport(this.resolve('IAirportsRepository')));
     this.registerFactory('ListAirports', () => new ListAirports(this.resolve('IAirportsRepository')));
 
-    // Register use cases - Itinerary
     this.registerFactory('ListItineraries', () => new ListItineraries(this.resolve('IItinerariesRepository')));
     this.registerFactory('CreateItinerary', () => new CreateItinerary(this.resolve('IItinerariesRepository'), this.resolve('IFlightsRepository')));
     this.registerFactory('GetItineraryById', () => new GetItineraryById(this.resolve('IItinerariesRepository')));
     this.registerFactory('DeleteItinerary', () => new DeleteItinerary(this.resolve('IItinerariesRepository')));
 
-    // Register use cases - Availability
     this.registerFactory('SearchAvailability', () => new SearchAvailability(this.resolve('IItinerariesRepository')));
 
-    // Register use cases - Booking
     this.registerFactory('CreateBooking', () => new CreateBooking(this.resolve('IBookingsRepository'), this.resolve('IUsersRepository'), this.resolve('IItinerariesRepository')));
     this.registerFactory('GetUserBookings', () => new GetUserBookings(this.resolve('IBookingsRepository'), this.resolve('IUsersRepository')));
     this.registerFactory('CancelBooking', () => new CancelBooking(this.resolve('IBookingsRepository')));
 
-    // Register controllers
     this.registerFactory('IAuthController', () => {
       const registerUser = this.resolve<RegisterUser>('IRegisterUserUseCase');
       const loginUser = this.resolve<LoginUser>('ILoginUserUseCase');
@@ -221,13 +208,10 @@ export class Container implements IContainer {
       this.resolve('DeleteItinerary')
     ));
 
-    // Register controller - Availability
     this.registerFactory('AvailabilityController', () => new AvailabilityController(this.resolve('SearchAvailability')));
 
-    // Register controller - Booking
     this.registerFactory('BookingController', () => new BookingController(this.resolve('CreateBooking'), this.resolve('GetUserBookings'), this.resolve('CancelBooking')));
 
-    // Register factories
     this.register('IRouteFactory', RouteFactory);
   }
 } 

@@ -14,7 +14,6 @@ export class GetItineraryById {
   constructor(private itinerariesRepository: IItinerariesRepository) {}
 
   async execute(request: GetItineraryByIdRequest): Promise<Itinerary> {
-    // Validação centralizada com zod
     const parsed = GetItineraryByIdSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');

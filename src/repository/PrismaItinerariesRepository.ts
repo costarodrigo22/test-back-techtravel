@@ -57,9 +57,8 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
   }
 
   async create(flightIds: string[]): Promise<Itinerary> {
-    // Cria o itinerário
     const created = await this.prisma.itinerary.create({ data: {} });
-    // Cria as relações na tabela ItineraryFlight
+
     await Promise.all(
       flightIds.map((flightId, idx) =>
         this.prisma.itineraryFlight.create({
@@ -71,11 +70,12 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
         })
       )
     );
-    // Busca os voos para consolidar a resposta
+
     const flights = await this.prisma.flight.findMany({
       where: { id: { in: flightIds } },
       orderBy: [{ departure_datetime: 'asc' }],
     });
+
     const flightsData: ItineraryFlight[] = flights.map(f => ({
       id: f.id,
       flight_number: f.flight_number,
@@ -84,7 +84,7 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
       departure_datetime: f.departure_datetime,
       arrival_datetime: f.arrival_datetime,
     }));
-    // Consolidar dados do itinerário
+
     const origin_iata = flightsData[0].origin_iata;
     const destination_iata = flightsData[flightsData.length - 1].destination_iata;
     const departure_datetime = flightsData[0].departure_datetime;
@@ -156,10 +156,10 @@ export class PrismaItinerariesRepository implements IItinerariesRepository {
 
   async delete(id: string): Promise<void> {
     try {
-      // Remove as relações ItineraryFlight primeiro
       await this.prisma.itineraryFlight.deleteMany({ where: { itineraryId: id } });
-      // Remove o itinerário
+
       const deleted = await this.prisma.itinerary.delete({ where: { id } });
+      
       if (!deleted) {
         throw new NotFoundError('Itinerário não encontrado.');
       }

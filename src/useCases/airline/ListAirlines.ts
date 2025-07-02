@@ -11,7 +11,6 @@ export class ListAirlines {
   constructor(private airlinesRepository: IAirlinesRepository) {}
 
   async execute(request: ListAirlinesRequest = {}): Promise<Airline[]> {
-    // Validação centralizada com zod
     const parsed = ListAirlinesSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');

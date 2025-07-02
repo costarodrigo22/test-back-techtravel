@@ -18,7 +18,6 @@ export class GetUserBookings {
   ) {}
 
   async execute(request: GetUserBookingsRequest): Promise<Booking[]> {
-    // Validação centralizada com zod
     const parsed = GetUserBookingsSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -27,13 +26,11 @@ export class GetUserBookings {
 
     const { userId } = request;
 
-    // Validar se o usuário existe
     const user = await this.usersRepository.findById(userId);
     if (!user) {
       throw new NotFoundError('Usuário não encontrado.');
     }
 
-    // Buscar todas as reservas do usuário
     return this.bookingsRepository.findByUserId(userId);
   }
 } 

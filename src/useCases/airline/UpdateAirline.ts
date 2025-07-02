@@ -18,7 +18,6 @@ export class UpdateAirline {
   constructor(private airlinesRepository: IAirlinesRepository) {}
 
   async execute(request: UpdateAirlineRequest): Promise<Airline> {
-    // Validação centralizada com zod
     const parsed = UpdateAirlineSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -27,7 +26,6 @@ export class UpdateAirline {
 
     const { id, data } = request;
 
-    // Verificar se a companhia aérea existe
     const existingAirline = await this.airlinesRepository.findById(id);
     if (!existingAirline) {
       throw new NotFoundError('Companhia aérea não encontrada.');

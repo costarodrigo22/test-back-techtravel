@@ -34,23 +34,19 @@ export class RegisterUser implements IRegisterUserUseCase {
   ) {}
 
   async execute(request: RegisterUserRequest): Promise<RegisterUserResponse> {
-    // Validação centralizada com zod
     const parsed = RegisterUserSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
       throw new AppError(message, 400);
     }
 
-    // Verificar se o usuário já existe
     const existingUser = await this.usersRepository.findByEmail(request.email);
     if (existingUser) {
       throw new AppError('Usuário já existe com este email', 400);
     }
 
-    // Hash da senha
     const hashedPassword = await bcrypt.hash(request.password, 10);
 
-    // Criar usuário
     const user = new User(
       request.name,
       request.email,
@@ -60,7 +56,6 @@ export class RegisterUser implements IRegisterUserUseCase {
 
     await this.usersRepository.create(user);
 
-    // Gerar tokens
     const accessToken = this.authService.generateAccessToken(user);
     const refreshToken = this.authService.generateRefreshToken(user);
 

@@ -23,19 +23,16 @@ export class AuthService implements IAuthService {
   constructor(private usersRepository: IUsersRepository) {}
 
   async login(email: string, password: string): Promise<AuthResponse> {
-    // Buscar usuário
     const user = await this.usersRepository.findByEmail(email);
     if (!user) {
       throw new Error('Email ou senha inválidos');
     }
 
-    // Verificar senha
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new Error('Email ou senha inválidos');
     }
 
-    // Gerar tokens
     const accessToken = this.generateAccessToken(user);
     const refreshToken = this.generateRefreshToken(user);
 

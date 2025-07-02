@@ -14,7 +14,6 @@ export class GetFlightById {
   constructor(private flightsRepository: IFlightsRepository) {}
 
   async execute(request: GetFlightByIdRequest): Promise<Flight> {
-    // Validação centralizada com zod
     const parsed = GetFlightByIdSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');

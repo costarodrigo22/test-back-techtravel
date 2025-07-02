@@ -18,7 +18,6 @@ export class UpdateAirport {
   constructor(private airportsRepository: IAirportsRepository) {}
 
   async execute(request: UpdateAirportRequest): Promise<Airport> {
-    // Validação centralizada com zod
     const parsed = UpdateAirportSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -27,7 +26,6 @@ export class UpdateAirport {
 
     const { id, data } = request;
 
-    // Verificar se o aeroporto existe
     const existingAirport = await this.airportsRepository.findById(id);
     if (!existingAirport) {
       throw new NotFoundError('Aeroporto não encontrado.');

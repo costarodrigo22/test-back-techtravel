@@ -97,7 +97,7 @@ Response ← Response ← Entity ← Prisma
 - Nome deve ter pelo menos 2 caracteres
 - Email deve ser válido
 - Senha deve ter pelo menos 6 caracteres
-- Gênero deve ser válido
+- Gênero deve ser válido (MALE, FEMALE, OTHER)
 - Email não pode estar em uso
 
 #### LoginUser

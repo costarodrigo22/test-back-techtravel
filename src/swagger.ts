@@ -1,4 +1,3 @@
-// src/swagger.ts
 import swaggerJSDoc from 'swagger-jsdoc';
 
 const options = {
@@ -11,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000', // ajuste conforme sua porta
+        url: 'http://localhost:3000',
       },
     ],
     components: {
@@ -25,7 +24,7 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ['./src/controllers/*.ts'], // Caminho para os controllers com JSDoc
+  apis: ['./src/controllers/*.ts'],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);

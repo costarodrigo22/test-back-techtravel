@@ -13,7 +13,6 @@ export class DeleteFlight {
   constructor(private flightsRepository: IFlightsRepository) {}
 
   async execute(request: DeleteFlightRequest): Promise<void> {
-    // Validação centralizada com zod
     const parsed = DeleteFlightSchema.safeParse(request);
     if (!parsed.success) {
       const message = parsed.error.errors.map(e => e.message).join('; ');
@@ -22,7 +21,6 @@ export class DeleteFlight {
 
     const { id } = request;
 
-    // Verificar se o voo existe
     const existingFlight = await this.flightsRepository.findById(id);
     if (!existingFlight) {
       throw new NotFoundError('Voo não encontrado.');
