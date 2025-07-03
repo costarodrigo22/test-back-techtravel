@@ -197,8 +197,6 @@ src/
 7. **Inicie a aplicação**
    ```bash
    npm run dev
-   # ou para produção
-   npm run build && npm start
    ```
 
 ---
