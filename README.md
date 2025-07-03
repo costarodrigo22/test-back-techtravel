@@ -161,6 +161,74 @@ src/
 - **GetUserBookings** - Listar reservas do usuário
 - **CancelBooking** - Cancelar reserva
 
+### 9. Buscar Disponibilidade de Itinerários
+
+**POST /availability/search**
+```json
+POST http://localhost:3000/availability/search
+Content-Type: application/json
+Authorization: Bearer <SEU_TOKEN_JWT>
+
+{
+  "origin_iata": "GRU",
+  "destination_iata": "JFK",
+  "departure_date": "2024-07-10",
+  "return_date": "2024-07-20"
+}
+```
+
+### 10. Refresh Token
+
+**POST /auth/refresh-token**
+```json
+POST http://localhost:3000/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "<SEU_REFRESH_TOKEN>"
+}
+```
+
+### 11. Buscar Companhia Aérea por ID
+
+**GET /airlines/{id}**
+```
+GET http://localhost:3000/airlines/<ID_DA_AIRLINE>
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 12. Buscar Aeroporto por ID
+
+**GET /airports/{id}**
+```
+GET http://localhost:3000/airports/<ID_DO_AEROPORTO>
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 13. Buscar Voo por ID
+
+**GET /flights/{id}**
+```
+GET http://localhost:3000/flights/<ID_DO_VOO>
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 14. Buscar Itinerário por ID
+
+**GET /itineraries/{id}**
+```
+GET http://localhost:3000/itineraries/<ID_DO_ITINERARIO>
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 15. Listar Reservas de um Usuário por ID
+
+**GET /users/{userId}/bookings**
+```
+GET http://localhost:3000/users/<ID_DO_USUARIO>/bookings
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
 ---
 
 ## ✅ Checklist pós-clone (para rodar o projeto do zero)
@@ -198,6 +266,22 @@ src/
    ```bash
    npm run dev
    ```
+
+---
+
+## 🛠️ Facilidade com Makefile
+
+Se você possui o [make](https://www.gnu.org/software/make/) instalado (Linux, Mac ou Windows com WSL/Git Bash), pode rodar todos os comandos essenciais do projeto de forma simples:
+
+```bash
+make setup   # Instala dependências, sobe o banco, roda migrações e gera o Prisma Client
+make dev     # Sobe a aplicação em modo desenvolvimento
+make test    # Executa os testes
+make db-up   # Sobe apenas o banco de dados
+make down    # Para todos os containers do Docker
+```
+
+Assim, você não precisa se preocupar com comandos longos ou ordem de execução. 
 
 ---
 
@@ -246,4 +330,214 @@ Dúvidas? Entre em contato pelo e-mail: [costarodrigosilva247@gmail.com]
 
 ---
 
-© 2025 TechTravel API teste. 
+## 📬 Exemplos de Requisições (Postman/Insomnia)
+
+Aqui estão exemplos de requisições para testar os principais endpoints da API. Você pode copiar e colar no Postman, Insomnia ou similar.
+
+### 1. Cadastro de Usuário
+
+**POST /auth/register**
+```json
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao@email.com",
+  "password": "senha123",
+  "gender": "MALE"
+}
+```
+
+### 2. Login
+
+**POST /auth/login**
+```json
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@email.com",
+  "password": "senha123"
+}
+```
+
+### 3. Cadastro de Companhia Aérea
+
+**POST /airlines**
+```json
+POST http://localhost:3000/airlines
+Content-Type: application/json
+Authorization: Bearer <SEU_TOKEN_JWT>
+
+{
+  "name": "LATAM Airlines",
+  "iata_code": "LA"
+}
+```
+
+### 4. Cadastro de Aeroporto
+
+**POST /airports**
+```json
+POST http://localhost:3000/airports
+Content-Type: application/json
+Authorization: Bearer <SEU_TOKEN_JWT>
+
+{
+  "name": "Aeroporto de Guarulhos",
+  "iata_code": "GRU"
+}
+```
+
+### 5. Cadastro de Voo
+
+**POST /flights**
+```json
+POST http://localhost:3000/flights
+Content-Type: application/json
+Authorization: Bearer <SEU_TOKEN_JWT>
+
+{
+  "flight_number": "LA3456",
+  "airline_id": "<ID_DA_AIRLINE>",
+  "origin_iata": "GRU",
+  "destination_iata": "JFK",
+  "departure_datetime": "2024-07-02T10:00:00Z",
+  "arrival_datetime": "2024-07-02T18:00:00Z",
+  "frequency": [1,3,5]
+}
+```
+
+### 6. Cadastro de Itinerário
+
+**POST /itineraries**
+```json
+POST http://localhost:3000/itineraries
+Content-Type: application/json
+Authorization: Bearer <SEU_TOKEN_JWT>
+
+{
+  "flight_ids": ["<ID_VOO_1>", "<ID_VOO_2>"]
+}
+```
+
+### 7. Criar Reserva
+
+**POST /bookings**
+```json
+POST http://localhost:3000/bookings
+Content-Type: application/json
+Authorization: Bearer <SEU_TOKEN_JWT>
+
+{
+  "userId": "<ID_DO_USUARIO>",
+  "itineraryId": "<ID_DO_ITINERARIO>"
+}
+```
+
+### 8. Consultas (GET)
+
+**Listar companhias aéreas:**
+```
+GET http://localhost:3000/airlines
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+**Listar aeroportos:**
+```
+GET http://localhost:3000/airports
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+**Listar voos:**
+```
+GET http://localhost:3000/flights
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+**Listar itinerários:**
+```
+GET http://localhost:3000/itineraries
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+**Listar reservas do usuário:**
+```
+GET http://localhost:3000/bookings
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 9. Buscar Disponibilidade de Itinerários
+
+**POST /availability/search**
+```json
+POST http://localhost:3000/availability/search
+Content-Type: application/json
+Authorization: Bearer <SEU_TOKEN_JWT>
+
+{
+  "origin_iata": "GRU",
+  "destination_iata": "JFK",
+  "departure_date": "2024-07-10",
+  "return_date": "2024-07-20"
+}
+```
+
+### 10. Refresh Token
+
+**POST /auth/refresh-token**
+```json
+POST http://localhost:3000/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "<SEU_REFRESH_TOKEN>"
+}
+```
+
+### 11. Buscar Companhia Aérea por ID
+
+**GET /airlines/{id}**
+```
+GET http://localhost:3000/airlines/<ID_DA_AIRLINE>
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 12. Buscar Aeroporto por ID
+
+**GET /airports/{id}**
+```
+GET http://localhost:3000/airports/<ID_DO_AEROPORTO>
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 13. Buscar Voo por ID
+
+**GET /flights/{id}**
+```
+GET http://localhost:3000/flights/<ID_DO_VOO>
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 14. Buscar Itinerário por ID
+
+**GET /itineraries/{id}**
+```
+GET http://localhost:3000/itineraries/<ID_DO_ITINERARIO>
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+### 15. Listar Reservas de um Usuário por ID
+
+**GET /users/{userId}/bookings**
+```
+GET http://localhost:3000/users/<ID_DO_USUARIO>/bookings
+Authorization: Bearer <SEU_TOKEN_JWT>
+```
+
+---
+
+> Para mais exemplos, consulte a documentação Swagger em [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+© 2025 TechTravel API teste.
