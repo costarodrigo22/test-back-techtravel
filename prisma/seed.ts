@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -57,13 +57,14 @@ async function main() {
 
   const itinerary = await prisma.itinerary.create({
     data: {
-      flight_ids: [flight.id],
-      origin_iata: 'GRU',
-      destination_iata: 'JFK',
-      type: 'ONE_WAY',
-      totalDuration: 480,
-      stops: 0,
-      isActive: true,
+      flights: {
+        create: [
+          {
+            flight: { connect: { id: flight.id } },
+            order: 1
+          }
+        ]
+      }
     },
   });
 

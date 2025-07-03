@@ -23,4 +23,5 @@ down:
 
 # Popula o banco de dados com dados iniciais
 seed:
-	npm run prisma:seed 
+	npm run prisma:generate
+	npm run prisma:seed
