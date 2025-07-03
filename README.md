@@ -11,7 +11,7 @@
 2. **Copie o arquivo de variáveis de ambiente:**
    ```sh
    cp .env.example .env
-   # Edite o .env se necessário (por padrão já funciona com o Docker)
+   # Edite o .env
    ```
 
 3. **Configure as variáveis de ambiente**
@@ -21,6 +21,8 @@
   JWT_SECRET="seu_jwt_secret_aqui"
   JWT_REFRESH_SECRET="seu_jwt_refresh_secret_aqui"
   PORT=3000
+  JWT_EXPIRES_IN="15m"
+  JWT_REFRESH_EXPIRES_IN="7d"
   ```
 
 
@@ -219,74 +221,6 @@ src/
 - **GetUserBookings** - Listar reservas do usuário
 - **CancelBooking** - Cancelar reserva
 
-### 9. Buscar Disponibilidade de Itinerários
-
-**POST /availability/search**
-```json
-POST http://localhost:3000/availability/search
-Content-Type: application/json
-Authorization: Bearer <SEU_TOKEN_JWT>
-
-{
-  "origin_iata": "GRU",
-  "destination_iata": "JFK",
-  "departure_date": "2024-07-10",
-  "return_date": "2024-07-20"
-}
-```
-
-### 10. Refresh Token
-
-**POST /auth/refresh-token**
-```json
-POST http://localhost:3000/auth/refresh-token
-Content-Type: application/json
-
-{
-  "refreshToken": "<SEU_REFRESH_TOKEN>"
-}
-```
-
-### 11. Buscar Companhia Aérea por ID
-
-**GET /airlines/{id}**
-```
-GET http://localhost:3000/airlines/<ID_DA_AIRLINE>
-Authorization: Bearer <SEU_TOKEN_JWT>
-```
-
-### 12. Buscar Aeroporto por ID
-
-**GET /airports/{id}**
-```
-GET http://localhost:3000/airports/<ID_DO_AEROPORTO>
-Authorization: Bearer <SEU_TOKEN_JWT>
-```
-
-### 13. Buscar Voo por ID
-
-**GET /flights/{id}**
-```
-GET http://localhost:3000/flights/<ID_DO_VOO>
-Authorization: Bearer <SEU_TOKEN_JWT>
-```
-
-### 14. Buscar Itinerário por ID
-
-**GET /itineraries/{id}**
-```
-GET http://localhost:3000/itineraries/<ID_DO_ITINERARIO>
-Authorization: Bearer <SEU_TOKEN_JWT>
-```
-
-### 15. Listar Reservas de um Usuário por ID
-
-**GET /users/{userId}/bookings**
-```
-GET http://localhost:3000/users/<ID_DO_USUARIO>/bookings
-Authorization: Bearer <SEU_TOKEN_JWT>
-```
-
 ---
 
 ## ✅ Checklist pós-clone (para rodar o projeto do zero)
@@ -393,14 +327,6 @@ Assim, você não precisa se preocupar com comandos longos ou ordem de execuçã
 - [Modelagem do Banco de Dados](./DATABASE_MODELING.md)
 - [Arquitetura de Casos de Uso](./USE_CASES_ARCHITECTURE.md)
 - [Clean Architecture com IoC e DI](./CLEAN_ARCHITECTURE.md)
-
----
-
-## 🤝 Contribuição e Contato
-
-Contribuições são bem-vindas! Abra issues ou pull requests.
-
-Dúvidas? Entre em contato pelo e-mail: [costarodrigosilva247@gmail.com]
 
 ---
 
@@ -613,5 +539,13 @@ Authorization: Bearer <SEU_TOKEN_JWT>
 ---
 
 > Para mais exemplos, consulte a documentação Swagger em [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+## 🤝 Contato
+
+Contribuições são bem-vindas! Abra issues ou pull requests.
+
+Dúvidas? Entre em contato pelo e-mail: [costarodrigosilva247@gmail.com]
+
+---
 
 © 2025 TechTravel API teste.

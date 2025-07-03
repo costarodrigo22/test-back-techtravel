@@ -21,7 +21,6 @@ setup: install db-up migrate generate
 down:
 	docker-compose down
 
-# Popula o banco de dados com dados iniciais
 seed:
 	npm run prisma:generate
 	npm run prisma:seed
