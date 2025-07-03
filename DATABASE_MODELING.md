@@ -56,12 +56,6 @@ Este documento descreve a modelagem completa do banco de dados para o sistema de
 - `id`: Identificador único (UUID)
 - `name`: Nome completo do aeroporto
 - `iata_code`: Código IATA único (ex: "GRU" para Guarulhos)
-- `city`: Cidade onde está localizado
-- `country`: País
-- `timezone`: Fuso horário
-- `latitude`: Latitude (opcional)
-- `longitude`: Longitude (opcional)
-- `isActive`: Status ativo/inativo
 - `createdAt`: Data de criação
 - `updatedAt`: Data da última atualização
 
@@ -88,13 +82,6 @@ Este documento descreve a modelagem completa do banco de dados para o sistema de
 - `departure_datetime`: Data/hora de partida (UTC)
 - `arrival_datetime`: Data/hora de chegada (UTC)
 - `frequency`: Array com dias da semana (0=Domingo, 1=Segunda, etc.)
-- `aircraftType`: Tipo de aeronave (opcional)
-- `capacity`: Capacidade do voo (opcional)
-- `status`: Status do voo (SCHEDULED, DELAYED, CANCELLED, etc.)
-- `gate`: Portão de embarque (opcional)
-- `terminal`: Terminal (opcional)
-- `createdAt`: Data de criação
-- `updatedAt`: Data da última atualização
 
 **Métodos**:
 - `operatesOn(dayOfWeek)`: Verifica se o voo opera em um dia específico
@@ -383,5 +370,3 @@ ORDER BY i.departure_datetime;
 - Sharding por região
 - Read replicas
 - Microserviços por domínio
-
-Esta modelagem fornece uma base sólida para o sistema de gestão de viagens corporativas, com foco em performance, escalabilidade e manutenibilidade.
