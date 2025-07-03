@@ -1,5 +1,53 @@
 # Sistema de Gestão de Viagens Corporativas - Backend
 
+## 🚦 Passo a passo para rodar o projeto e popular o banco (para recrutadores)
+
+1. **Clone o repositório e acesse a pasta do projeto:**
+   ```sh
+   git clone https://github.com/costarodrigo22/test-back-techtravel.git
+   cd test-back-techtravel
+   ```
+
+2. **Copie o arquivo de variáveis de ambiente:**
+   ```sh
+   cp .env.example .env
+   # Edite o .env se necessário (por padrão já funciona com o Docker)
+   ```
+
+
+3. **Instale as dependências, gere o Prisma Client e rode as migrações:**
+   ```sh
+   make setup
+   ```
+
+4. **(Opcional, mas recomendado) Popule o banco com dados de exemplo:**
+   ```sh
+   make seed
+   ```
+   > Isso cria um usuário de testes:
+   > - **Email:** recrutador@teste.com
+   > - **Senha:** senha123
+
+5. **Inicie a aplicação em modo desenvolvimento:**
+   ```sh
+   make dev
+   ```
+
+6. **Acesse a API:**
+   - Por padrão, estará em: http://localhost:3000
+
+7. **Para rodar os testes:**
+   ```sh
+   make test
+   ```
+
+8. **Para parar o banco de dados:**
+   ```sh
+   make down
+   ```
+
+---
+
 Sistema completo para gestão de viagens corporativas com autenticação JWT, gestão de companhias aéreas, aeroportos, voos, itinerários, busca de disponibilidade e reservas, seguindo os princípios da Clean Architecture com Inversion of Control e Dependency Injection.
 
 ## 🚀 Tecnologias
