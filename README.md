@@ -42,8 +42,9 @@
    make dev
    ```
 
-7. **Acesse a API:**
+7. **Acesse a API e Doc:**
    - Por padrão, estará em: http://localhost:3000
+   - Documentação estará em: http://localhost:3000/api-docs
 
 8. **Para rodar os testes:**
    ```sh
