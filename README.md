@@ -14,13 +14,22 @@
    # Edite o .env se necessário (por padrão já funciona com o Docker)
    ```
 
+3. **Configure as variáveis de ambiente**
+- Copie `.env.example` para `.env` e ajuste as variáveis:
+  ```env
+  DATABASE_URL="postgresql://postgres:postgres@localhost:5432/travel_management"
+  JWT_SECRET="seu_jwt_secret_aqui"
+  JWT_REFRESH_SECRET="seu_jwt_refresh_secret_aqui"
+  PORT=3000
+  ```
 
-3. **Instale as dependências, gere o Prisma Client e rode as migrações:**
+
+4. **Instale as dependências, gere o Prisma Client e rode as migrações:**
    ```sh
    make setup
    ```
 
-4. **(Opcional, mas recomendado) Popule o banco com dados de exemplo:**
+5. **(Opcional, mas recomendado) Popule o banco com dados de exemplo:**
    ```sh
    make seed
    ```
@@ -28,20 +37,20 @@
    > - **Email:** recrutador@teste.com
    > - **Senha:** senha123
 
-5. **Inicie a aplicação em modo desenvolvimento:**
+6. **Inicie a aplicação em modo desenvolvimento:**
    ```sh
    make dev
    ```
 
-6. **Acesse a API:**
+7. **Acesse a API:**
    - Por padrão, estará em: http://localhost:3000
 
-7. **Para rodar os testes:**
+8. **Para rodar os testes:**
    ```sh
    make test
    ```
 
-8. **Para parar o banco de dados:**
+9. **Para parar o banco de dados:**
    ```sh
    make down
    ```
