@@ -277,12 +277,28 @@ Se você possui o [make](https://www.gnu.org/software/make/) instalado (Linux, M
 make setup   # Instala dependências, sobe o banco, roda migrações e gera o Prisma Client
 make dev     # Sobe a aplicação em modo desenvolvimento
 make test    # Executa os testes
-make db-up   # Sobe apenas o banco de dados
-make down    # Para todos os containers do Docker
 ```
 
-Assim, você não precisa se preocupar com comandos longos ou ordem de execução. 
+## 🌱 Populando o banco de dados (Seeding)
 
+Para facilitar seus testes, você pode popular o banco com dados iniciais rodando:
+
+```bash
+make seed
+```
+Isso irá criar:
+- Um usuário de testes:
+  - **Email:** recrutador@teste.com
+  - **Senha:** senha123
+- Uma companhia aérea (TechTravel Airlines)
+- Dois aeroportos (GRU e JFK)
+- Um voo de GRU para JFK
+- Um itinerário
+- Uma reserva já vinculada ao usuário
+
+Assim, você pode autenticar e testar a API imediatamente!
+
+Assim, você não precisa se preocupar com comandos longos ou ordem de execução. 
 ---
 
 ## 🗂️ Observações sobre a pasta `generated`
